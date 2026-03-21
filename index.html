@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gift Robux - Roblox</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #000;
+      color: #e1e1e1;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    h1 {
+      font-size: 48px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: 32px;
+      color: #00ccff;
+      margin: 50px 0 20px;
+    }
+    p {
+      font-size: 20px;
+      max-width: 800px;
+      margin: 0 auto 30px;
+    }
+    .highlight {
+      color: #00ff88;
+      font-weight: bold;
+    }
+    .warning {
+      background: #4a0000;
+      border: 2px solid #ff4444;
+      padding: 25px;
+      border-radius: 12px;
+      margin: 40px auto;
+      max-width: 700px;
+      font-size: 18px;
+      color: #ffdddd;
+    }
+    .legal {
+      font-size: 14px;
+      color: #888;
+      margin-top: 60px;
+      border-top: 1px solid #333;
+      padding-top: 20px;
+    }
+    .demo-section {
+      margin: 60px 0;
+      padding: 30px;
+      background: #111;
+      border-radius: 12px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    input[type="text"] {
+      padding: 14px;
+      font-size: 18px;
+      width: 80%;
+      max-width: 400px;
+      border: none;
+      border-radius: 8px;
+      background: #222;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+    #avatar-preview {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin: 20px auto;
+      display: block;
+      object-fit: cover;
+      border: 3px solid #00ccff;
+      box-shadow: 0 0 15px rgba(0,204,255,0.5);
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Gift Robux</h1>
+
+    <p class="highlight" style="font-size:28px;">Send up to 25% more Robux to friends and family!</p>
+
+    <h2>What’s Roblox?</h2>
+    <p>Roblox is a global platform where millions of people create, play, and connect.<br>
+    Robux is the virtual currency that lets users customize their avatar, access experiences, and more.</p>
+
+    <h2>What’s Gift Robux?</h2>
+    <p>This feature lets you send Robux directly to the Roblox account of the person who shared this link.<br>
+    Just follow the steps to complete your gift—no codes or gift cards needed.</p>
+
+    <h2>Don’t know the person?</h2>
+    <div class="warning">
+      If you don’t know the person sending the link, you can ignore it and contact <a href="https://www.roblox.com/support" style="color:#ffdddd;">Roblox support</a>.
+    </div>
+
+    <!-- Simple demo: type username → show placeholder avatar (uses Roblox public thumbnail API) -->
+    <div class="demo-section">
+      <h2>Demo: Check Roblox Avatar</h2>
+      <p style="font-size:16px; color:#aaa;">Type any Roblox username below (real ones work best):</p>
+      <input type="text" id="username-input" placeholder="Enter Roblox username..." oninput="updateAvatar()">
+      <img id="avatar-preview" src="https://via.placeholder.com/150?text=Avatar" alt="Roblox Avatar Preview" class="hidden">
+      <p id="status" style="color:#aaa; font-size:16px;"></p>
+    </div>
+
+    <div class="legal">
+      Robux is provided by Roblox. Purchases grant a limited license only.<br>
+      By proceeding, you agree you are over 18, authorize charges, and accept the 
+      <a href="https://www.roblox.com/info/terms" style="color:#888;">Terms of Use</a> 
+      (including arbitration) and 
+      <a href="https://www.roblox.com/info/privacy" style="color:#888;">Privacy Policy</a>.
+    </div>
+  </div>
+
+  <script>
+    function updateAvatar() {
+      const input = document.getElementById('username-input').value.trim();
+      const preview = document.getElementById('avatar-preview');
+      const status = document.getElementById('status');
+
+      if (input.length < 3) {
+        preview.classList.add('hidden');
+        status.textContent = '';
+        return;
+      }
+
+      // Note: This uses Roblox's public avatar thumbnail endpoint (no API key needed, but limited reliability)
+      // First, we need userId from username → but Roblox doesn't have direct username→id public endpoint without API.
+      // For demo: skip real lookup, just show placeholder or assume common pattern (won't always work)
+      // Real way needs Roblox API + authentication — not possible here.
+
+      status.textContent = 'Fetching avatar... (using public thumbnail)';
+      preview.src = `https://thumbnails.roblox.com/v1/users/avatar?userIds=1&size=150x150&format=Png`; // placeholder example
+      preview.classList.remove('hidden');
+
+      // For better demo: you could use a third-party wrapper or hardcode, but keep simple
+      // In practice: this endpoint needs userId, not username. Full lookup requires more steps.
+      status.textContent = '(Note: Real username lookup needs Roblox API — showing placeholder avatar style)';
+    }
+  </script>
+
+</body>
+</html>
