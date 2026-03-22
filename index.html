@@ -2,186 +2,571 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gift Robux</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Gift Robux · Roblox Gifting Simulator</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #000;
-      color: #e1e1e1;
+    * {
       margin: 0;
       padding: 0;
-      line-height: 1.6;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Inter', sans-serif;
+      background: radial-gradient(ellipse at 30% 20%, #0a0c16, #000000);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .gift-container {
+      max-width: 820px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .page {
+      background: rgba(12, 16, 28, 0.94);
+      backdrop-filter: blur(12px);
+      border-radius: 48px;
+      padding: 36px 28px 44px;
+      box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 230, 250, 0.3);
+      transition: all 0.25s ease;
+      display: none;
+      animation: floatIn 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    .active {
+      display: block;
+    }
+
+    @keyframes floatIn {
+      0% { opacity: 0; transform: translateY(18px) scale(0.97); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    h1 {
+      font-size: 52px;
+      font-weight: 800;
+      background: linear-gradient(125deg, #FFFFFF, #3effc0, #1ecbe8);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .glow-badge {
+      background: rgba(0, 255, 160, 0.18);
+      border: 1px solid #4effb055;
+      display: inline-block;
+      padding: 6px 22px;
+      border-radius: 60px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #c6ffe0;
+      margin-bottom: 24px;
+    }
+
+    .desc {
+      font-size: 18px;
+      color: #cbd8f0;
+      line-height: 1.5;
+      margin: 16px 0;
+    }
+
+    .recipient-card {
+      background: #0b1020cc;
+      border-radius: 44px;
+      padding: 24px;
+      margin: 28px 0;
+      border: 1px solid #2c506e;
+    }
+
+    .username-field {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .username-field input {
+      flex: 2;
+      min-width: 220px;
+      padding: 16px 24px;
+      font-size: 18px;
+      background: #010a14;
+      border: 1.5px solid #2d6185;
+      border-radius: 60px;
+      color: white;
+      outline: none;
+      transition: 0.2s;
+      font-weight: 500;
+    }
+
+    .username-field input:focus {
+      border-color: #2affb0;
+      box-shadow: 0 0 10px #2affb070;
+    }
+
+    .avatar-preview-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .avatar-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #2affc0;
+      background: #11161f;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+
+    .status-message {
+      font-size: 15px;
+      background: #11161fcc;
+      padding: 8px 20px;
+      border-radius: 60px;
+      color: #b8d0ff;
+    }
+
+    .amount-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin: 32px 0;
+    }
+
+    .amount-option {
+      background: #11161f;
+      border-radius: 48px;
+      padding: 14px 22px;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid #2f6080;
+      text-align: center;
+      min-width: 140px;
+    }
+
+    .amount-option.selected {
+      background: #1a6d8c;
+      border-color: #9efff0;
+      box-shadow: 0 0 14px #00e0ffaa;
+      transform: scale(1.02);
+    }
+
+    .robux-num {
+      font-size: 28px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .price-tag {
+      font-size: 15px;
+      color: #bbdcff;
+    }
+
+    .bonus-chip {
+      font-size: 12px;
+      background: #ffb34744;
+      border-radius: 40px;
+      padding: 4px 12px;
+      display: inline-block;
+      margin-top: 8px;
+    }
+
+    .bonus-banner {
+      background: #0e1824;
+      border-radius: 40px;
+      padding: 12px 18px;
+      margin: 12px 0;
+      font-size: 16px;
       text-align: center;
     }
-    .page {
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 30px;
-      background: #111;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,204,255,0.2);
-      display: none;
-    }
-    .active { display: block; }
-    h1 { font-size: 42px; color: #00ccff; margin-bottom: 10px; }
-    h2 { font-size: 28px; color: #00ff88; }
-    p { font-size: 18px; max-width: 700px; margin: 20px auto; }
-    .highlight { color: #00ff88; font-weight: bold; font-size: 22px; }
+
     button {
-      background: #00ccff;
-      color: #000;
+      background: linear-gradient(100deg, #00b8ff, #1f6fcf);
       border: none;
-      padding: 14px 32px;
-      font-size: 20px;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      margin: 20px 10px;
-      transition: background 0.3s;
-    }
-    button:hover { background: #00aaff; }
-    select, input[type="radio"] {
-      padding: 12px;
+      padding: 14px 36px;
       font-size: 18px;
-      margin: 15px;
-      background: #222;
-      color: #fff;
-      border: 1px solid #444;
-      border-radius: 6px;
+      font-weight: bold;
+      border-radius: 60px;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      margin: 12px 8px;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.5);
     }
-    .amount-options label {
-      display: block;
-      margin: 15px 0;
-      font-size: 20px;
+
+    button.secondary {
+      background: #2a4058;
     }
-    .success {
-      font-size: 36px;
-      color: #00ff88;
-      margin: 40px 0;
-      text-shadow: 0 0 10px #00ff88;
+
+    button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
     }
-    .details {
-      background: #1a1a1a;
-      padding: 25px;
-      border-radius: 10px;
-      margin: 30px auto;
-      max-width: 500px;
-      border: 1px solid #00ccff;
+
+    .detail-panel {
+      background: #0c1122;
+      border-radius: 44px;
+      padding: 28px;
+      margin: 24px 0;
+      text-align: left;
     }
-    .legal {
+
+    .success-icon {
+      font-size: 70px;
+      background: #19a86b;
+      width: 110px;
+      height: 110px;
+      line-height: 110px;
+      border-radius: 50%;
+      margin: 20px auto;
+      box-shadow: 0 0 25px #3eff9e;
+    }
+
+    hr {
+      margin: 16px 0;
+      border-color: #2e4a6e;
+    }
+
+    .legal-footer {
+      font-size: 11px;
+      color: #62738b;
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    .warning-note {
+      background: #2a1015;
+      border-left: 5px solid #ff7777;
+      padding: 14px 18px;
+      border-radius: 24px;
+      margin: 20px 0;
       font-size: 14px;
-      color: #888;
-      margin-top: 60px;
-      border-top: 1px solid #333;
-      padding-top: 20px;
+      color: #ffcfcf;
+    }
+
+    @media (max-width: 550px) {
+      .page { padding: 24px 18px; }
+      h1 { font-size: 38px; }
+      .amount-option { min-width: 110px; }
     }
   </style>
 </head>
 <body>
-
-  <!-- Page 1: Landing / Gift button -->
-  <div id="page1" class="page active">
-    <h1>Gift Robux</h1>
-    <p class="highlight">Send up to 25% more Robux to friends and family!</p>
+<div class="gift-container">
+  <!-- PAGE 1 - LANDING + RECIPIENT INPUT -->
+  <div id="landingPage" class="page active">
+    <h1>🎁 Gift Robux</h1>
+    <div class="glow-badge">✨ +25% EXTRA BONUS ✨</div>
+    <p class="desc">Send Robux directly to any Roblox account — no gift cards, no codes. Instant gifting simulation.</p>
     
-    <p>This feature lets you send Robux directly to another Roblox account.<br>
-    Just follow the steps — no codes or gift cards needed.</p>
+    <div class="recipient-card">
+      <h2 style="font-size: 24px; margin-bottom: 12px;">👤 Recipient username</h2>
+      <div class="username-field">
+        <input type="text" id="usernameInput" placeholder="e.g., Builderman, Roblox, zunix" autocomplete="off">
+      </div>
+      <div class="avatar-preview-area">
+        <img id="avatarPreview" class="avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23222'/%3E%3C/svg%3E" alt="avatar">
+        <div id="statusMsg" class="status-message">✨ Enter a Roblox username</div>
+      </div>
+    </div>
 
-    <button onclick="goToPage('page2')">Start Gifting</button>
-
-    <div class="legal">
-      Robux is provided by Roblox. Purchases grant a limited license only.<br>
-      See <a href="https://www.roblox.com/gift-robux" style="color:#00ccff;">Gift Robux</a>.
+    <button id="startGiftingBtn" disabled>🚀 Continue to Amount →</button>
+    <div class="legal-footer">
+      Demo simulation — real Robux purchases only via roblox.com. Fan-made preview.
     </div>
   </div>
 
-  <!-- Page 2: Select amount -->
-  <div id="page2" class="page">
-    <h1>Select Amount</h1>
-    <p class="highlight">Choose how much Robux to gift:</p>
+  <!-- PAGE 2 - AMOUNT SELECTION -->
+  <div id="amountPage" class="page">
+    <h1>💰 Choose amount</h1>
+    <div class="bonus-banner" id="bonusText"></div>
+    <div class="amount-grid" id="amountGrid"></div>
+    <button id="reviewBtn">📦 Review & Confirm</button>
+    <button id="backToLandingFromAmount" class="secondary">← Back</button>
+  </div>
 
-    <div class="amount-options">
-      <label><input type="radio" name="amount" value="400" checked> 400 Robux — $4.99</label>
-      <label><input type="radio" name="amount" value="800"> 800 Robux — $9.99</label>
-      <label><input type="radio" name="amount" value="1700"> 1,700 Robux — $19.99</label>
-      <label><input type="radio" name="amount" value="4500"> 4,500 Robux — $49.99</label>
-      <label><input type="radio" name="amount" value="10000"> 10,000 Robux — $99.99</label>
+  <!-- PAGE 3 - REVIEW + FINAL SIMULATION -->
+  <div id="reviewPage" class="page">
+    <h1>📋 Review gift</h1>
+    <div class="detail-panel">
+      <p><strong>👤 Recipient:</strong> <span id="reviewUsername">—</span></p>
+      <div style="display: flex; justify-content: center; margin: 12px 0;">
+        <img id="reviewAvatar" class="avatar-img" style="width: 70px; height: 70px;" src="" alt="avatar">
+      </div>
+      <p><strong>🟣 Base Robux:</strong> <span id="reviewBase">0</span> Robux</p>
+      <p><strong>🎁 25% Bonus:</strong> +<span id="reviewBonusAmt">0</span> Robux</p>
+      <p><strong>✨ Total to receive:</strong> <span id="reviewTotal" style="color:#6effb0; font-size: 24px; font-weight: bold;">0</span> Robux</p>
+      <hr>
+      <p><strong>💵 Price (simulated):</strong> $<span id="reviewPrice">0.00</span></p>
+      <div class="warning-note" style="margin-top: 16px;">
+        ⚡ Demo only — no real charge. Official gifts require Roblox checkout.
+      </div>
     </div>
-
-    <p style="font-size:16px; color:#aaa;">Prices may vary by region and platform</p>
-
-    <button onclick="goToPage('page3')">Continue</button>
-    <button onclick="goToPage('page1')" style="background:#666;">Back</button>
+    <button id="finalSendBtn">🎉 Send Gift (simulate)</button>
+    <button id="backToAmountFromReview" class="secondary">← Back</button>
   </div>
 
-  <!-- Page 3: Confirm & Send -->
-  <div id="page3" class="page">
-    <h1>Confirm Gift</h1>
-    <p class="highlight" id="confirm-amount">Sending 400 Robux</p>
-    <p>Recipient: [Demo User]<br>
-    Review before sending.</p>
-
-    <button onclick="showSuccess()">Send Gift</button>
-    <button onclick="goToPage('page2')" style="background:#666;">Back</button>
-  </div>
-
-  <!-- Page 4: Success -->
-  <div id="page4" class="page">
-    <div class="success">Success!</div>
-    <p>Your gift has been sent.</p>
-    <p style="font-size:20px; color:#aaa;">It will arrive in up to 24 hours.</p>
-
-    <button onclick="goToPage('page5')">View Details</button>
-  </div>
-
-  <!-- Page 5: Details -->
-  <div id="page5" class="page">
-    <h1>Gift Details</h1>
-    <div class="details">
-      <p><strong>Amount:</strong> <span id="detail-amount">400 Robux</span></p>
-      <p><strong>To:</strong> [Demo User]</p>
-      <p><strong>Sent on:</strong> March 22, 2026</p>
-      <p><strong>Status:</strong> Processing</p>
-      <p><strong>Estimated arrival:</strong> Within 24 hours</p>
+  <!-- PAGE 4 - SUCCESS + ARRIVAL -->
+  <div id="successPage" class="page">
+    <div style="text-align: center;">
+      <div class="success-icon">🎉</div>
+      <h2 style="color:#8effb0;">Gift Sent Successfully!</h2>
+      <p class="desc"><span id="successRecipientName">Friend</span> will receive <strong id="successTotalRobux">0</strong> Robux<br>(including +25% bonus)</p>
+      <div class="detail-panel" style="text-align: center;">
+        <p>📬 Status: <strong>Processing → Delivered</strong></p>
+        <p>⏱️ Estimated arrival: <strong>Within 24 hours</strong></p>
+        <p style="font-size:13px; margin-top: 12px;">💡 Real Roblox gifts are instant after official checkout.</p>
+      </div>
+      <button id="newGiftBtn">✨ Send Another Gift</button>
     </div>
-
-    <button onclick="goToPage('page1')">Start Over</button>
   </div>
+</div>
 
-  <script>
-    let selectedAmount = 400;
+<script>
+  // ---------- ROBLOX API HELPERS (Username → ID → Avatar) ----------
+  let currentRecipient = {
+    username: "",
+    userId: null,
+    avatarUrl: null
+  };
 
-    function goToPage(pageId) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById(pageId).classList.add('active');
+  let selectedRobuxPackage = null;
+  let selectedIndex = 0;
 
-      if (pageId === 'page3') {
-        const radios = document.querySelectorAll('input[name="amount"]');
-        radios.forEach(r => {
-          if (r.checked) selectedAmount = r.value;
-        });
-        document.getElementById('confirm-amount').textContent = `Sending ${selectedAmount} Robux`;
-      }
+  const amountPackages = [
+    { robux: 400, price: 4.99, bonus: 100 },
+    { robux: 800, price: 9.99, bonus: 200 },
+    { robux: 1700, price: 19.99, bonus: 425 },
+    { robux: 4500, price: 49.99, bonus: 1125 },
+    { robux: 10000, price: 99.99, bonus: 2500 }
+  ];
 
-      if (pageId === 'page5') {
-        document.getElementById('detail-amount').textContent = `${selectedAmount} Robux`;
-      }
-    }
+  // DOM elements
+  const landingPage = document.getElementById('landingPage');
+  const amountPage = document.getElementById('amountPage');
+  const reviewPage = document.getElementById('reviewPage');
+  const successPage = document.getElementById('successPage');
+  const usernameInput = document.getElementById('usernameInput');
+  const avatarPreview = document.getElementById('avatarPreview');
+  const statusMsg = document.getElementById('statusMsg');
+  const startBtn = document.getElementById('startGiftingBtn');
+  const amountGrid = document.getElementById('amountGrid');
+  const bonusTextDiv = document.getElementById('bonusText');
 
-    function showSuccess() {
-      goToPage('page4');
-    }
+  function showPage(pageName) {
+    [landingPage, amountPage, reviewPage, successPage].forEach(p => p.classList.remove('active'));
+    if (pageName === 'landing') landingPage.classList.add('active');
+    if (pageName === 'amount') amountPage.classList.add('active');
+    if (pageName === 'review') reviewPage.classList.add('active');
+    if (pageName === 'success') successPage.classList.add('active');
+  }
 
-    document.querySelectorAll('input[name="amount"]').forEach(radio => {
-      radio.addEventListener('change', () => {
-        if (document.getElementById('page3').classList.contains('active')) {
-          selectedAmount = radio.value;
-          document.getElementById('confirm-amount').textContent = `Sending ${selectedAmount} Robux`;
-        }
+  // Fetch user ID and avatar from Roblox public APIs
+  async function fetchRobloxUserData(username) {
+    if (!username || username.length < 3) return null;
+    try {
+      const userRes = await fetch('https://users.roblox.com/v1/usernames/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usernames: [username] })
       });
-    });
-  </script>
+      const userJson = await userRes.json();
+      if (!userJson.data || userJson.data.length === 0) return null;
+      const userId = userJson.data[0].id;
+      
+      const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=false`);
+      const thumbJson = await thumbRes.json();
+      let avatarUrl = null;
+      if (thumbJson.data && thumbJson.data[0] && thumbJson.data[0].imageUrl) {
+        avatarUrl = thumbJson.data[0].imageUrl;
+      }
+      return { userId, avatarUrl, username: userJson.data[0].name };
+    } catch (err) {
+      console.warn("Roblox API fetch error:", err);
+      return null;
+    }
+  }
 
+  let debounceTimer = null;
+  async function updateRecipientPreview() {
+    const rawUsername = usernameInput.value.trim();
+    if (rawUsername.length < 3) {
+      avatarPreview.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23222'/%3E%3C/svg%3E";
+      statusMsg.innerHTML = "👤 Enter at least 3 characters";
+      startBtn.disabled = true;
+      currentRecipient = { username: "", userId: null, avatarUrl: null };
+      return;
+    }
+
+    statusMsg.innerHTML = "🔍 Looking up Roblox account...";
+    startBtn.disabled = true;
+    try {
+      const data = await fetchRobloxUserData(rawUsername);
+      if (data && data.userId) {
+        currentRecipient = {
+          username: data.username,
+          userId: data.userId,
+          avatarUrl: data.avatarUrl
+        };
+        if (data.avatarUrl) {
+          avatarPreview.src = data.avatarUrl;
+        } else {
+          avatarPreview.src = "https://www.roblox.com/favicon.ico";
+        }
+        statusMsg.innerHTML = `✅ ${data.username} — ready to gift!`;
+        startBtn.disabled = false;
+      } else {
+        avatarPreview.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23444'/%3E%3C/svg%3E";
+        statusMsg.innerHTML = "❌ Username not found on Roblox. Try another.";
+        startBtn.disabled = true;
+        currentRecipient = { username: "", userId: null, avatarUrl: null };
+      }
+    } catch (err) {
+      statusMsg.innerHTML = "⚠️ Network error. Try again.";
+      startBtn.disabled = true;
+    }
+  }
+
+  function onUsernameInput() {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      updateRecipientPreview();
+    }, 500);
+  }
+  usernameInput.addEventListener('input', onUsernameInput);
+
+  function renderAmountOptions() {
+    if (!amountGrid) return;
+    amountGrid.innerHTML = '';
+    amountPackages.forEach((pkg, idx) => {
+      const isSelected = (selectedIndex === idx);
+      const div = document.createElement('div');
+      div.className = `amount-option ${isSelected ? 'selected' : ''}`;
+      const totalBonus = pkg.robux + pkg.bonus;
+      div.innerHTML = `
+        <div class="robux-num">${pkg.robux.toLocaleString()} Robux</div>
+        <div class="price-tag">$${pkg.price.toFixed(2)}</div>
+        <div class="bonus-chip">+${pkg.bonus} bonus → ${totalBonus} total</div>
+      `;
+      div.addEventListener('click', () => {
+        selectedIndex = idx;
+        renderAmountOptions();
+        updateBonusBanner();
+      });
+      amountGrid.appendChild(div);
+    });
+    updateBonusBanner();
+  }
+
+  function updateBonusBanner() {
+    const pkg = amountPackages[selectedIndex];
+    if (bonusTextDiv) {
+      const totalWithBonus = pkg.robux + pkg.bonus;
+      bonusTextDiv.innerHTML = `🎁 <strong>+25% BONUS</strong> — You'll send ${pkg.robux.toLocaleString()} Robux + ${pkg.bonus} extra = <span style="color:#9effc0;">${totalWithBonus.toLocaleString()} total Robux</span> to recipient.`;
+    }
+  }
+
+  function populateReviewPage() {
+    const pkg = amountPackages[selectedIndex];
+    const total = pkg.robux + pkg.bonus;
+    const displayName = currentRecipient.username || usernameInput.value.trim() || "Unknown Player";
+    document.getElementById('reviewUsername').innerText = displayName;
+    document.getElementById('reviewBase').innerText = pkg.robux.toLocaleString();
+    document.getElementById('reviewBonusAmt').innerText = pkg.bonus.toLocaleString();
+    document.getElementById('reviewTotal').innerText = total.toLocaleString();
+    document.getElementById('reviewPrice').innerText = pkg.price.toFixed(2);
+    const reviewAvatarImg = document.getElementById('reviewAvatar');
+    if (currentRecipient.avatarUrl) {
+      reviewAvatarImg.src = currentRecipient.avatarUrl;
+    } else {
+      reviewAvatarImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23333'/%3E%3C/svg%3E";
+    }
+  }
+
+  function populateSuccessPage() {
+    const pkg = amountPackages[selectedIndex];
+    const total = pkg.robux + pkg.bonus;
+    const recip = currentRecipient.username || usernameInput.value.trim() || "friend";
+    document.getElementById('successRecipientName').innerText = recip;
+    document.getElementById('successTotalRobux').innerText = total.toLocaleString();
+  }
+
+  // Event handlers
+  startBtn.addEventListener('click', () => {
+    if (!currentRecipient.username && usernameInput.value.trim().length >= 3 && !currentRecipient.userId) {
+      statusMsg.innerHTML = "Please wait for username verification...";
+      return;
+    }
+    if (!currentRecipient.username && usernameInput.value.trim().length < 3) {
+      statusMsg.innerHTML = "Enter a valid Roblox username first.";
+      return;
+    }
+    showPage('amount');
+  });
+
+  document.getElementById('reviewBtn').addEventListener('click', () => {
+    if (!currentRecipient.username && usernameInput.value.trim().length >= 3 && !currentRecipient.userId) {
+      alert("Please wait for username verification on the previous page.");
+      showPage('landing');
+      return;
+    }
+    if (!currentRecipient.username && usernameInput.value.trim().length < 3) {
+      alert("Please set a recipient username on the first page.");
+      showPage('landing');
+      return;
+    }
+    populateReviewPage();
+    showPage('review');
+  });
+
+  document.getElementById('finalSendBtn').addEventListener('click', () => {
+    if (!currentRecipient.username && usernameInput.value.trim().length < 3) {
+      alert("Recipient missing, returning to start.");
+      showPage('landing');
+      return;
+    }
+    populateSuccessPage();
+    showPage('success');
+  });
+
+  document.getElementById('newGiftBtn').addEventListener('click', () => {
+    usernameInput.value = "";
+    avatarPreview.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23222'/%3E%3C/svg%3E";
+    statusMsg.innerHTML = "✨ Enter a Roblox username";
+    currentRecipient = { username: "", userId: null, avatarUrl: null };
+    startBtn.disabled = true;
+    selectedIndex = 0;
+    renderAmountOptions();
+    showPage('landing');
+  });
+
+  document.getElementById('backToLandingFromAmount').addEventListener('click', () => {
+    showPage('landing');
+  });
+  document.getElementById('backToAmountFromReview').addEventListener('click', () => {
+    showPage('amount');
+  });
+
+  // Initialize
+  renderAmountOptions();
+  selectedIndex = 0;
+  updateBonusBanner();
+  usernameInput.placeholder = "e.g., Roblox, Builderman";
+  statusMsg.innerHTML = "🎮 Try 'Builderman' or any Roblox user";
+</script>
 </body>
 </html>
