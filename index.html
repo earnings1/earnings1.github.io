@@ -1,1101 +1,537 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Roblox Gift Simulator · Send Robux (Interactive Demo)</title>
-  <meta name="description" content="Simulate sending Robux to friends — interactive gift flow with avatar preview, bonus system, and realistic checkout simulation." />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Earn & Leaderboard · Adexora</title>
   <style>
     * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
     }
-
     body {
-      font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Inter', sans-serif;
-      background: radial-gradient(ellipse at 30% 10%, #0b0e1a, #010101);
+      background: linear-gradient(145deg, #0b1426 0%, #1a263b 100%);
       min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 16px;
+      color: #e6edff;
     }
-
-    /* main card container */
-    .sim-card {
-      max-width: 750px;
+    .glass-card {
+      background: rgba(18, 28, 50, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 32px;
+      border: 1px solid rgba(90, 140, 255, 0.25);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+      padding: 24px 20px;
       width: 100%;
-      background: rgba(8, 12, 24, 0.85);
-      backdrop-filter: blur(14px);
-      border-radius: 56px;
-      padding: 32px 28px 40px;
-      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 255, 255, 0.2);
-      transition: all 0.2s ease;
-      border: 1px solid rgba(0, 200, 255, 0.3);
+      max-width: 580px;
     }
-
-    /* pages */
-    .page {
-      display: none;
-      animation: fadeScale 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-    }
-
-    .active-page {
-      display: block;
-    }
-
-    @keyframes fadeScale {
-      0% { opacity: 0; transform: scale(0.96); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-
     h1 {
-      font-size: 48px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #ffffff, #3effc0, #2ad4ff);
-      background-clip: text;
+      font-size: 2.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #c0e0ff, #a9c9ff);
       -webkit-background-clip: text;
-      color: transparent;
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
-    }
-
-    .badge-glow {
-      background: rgba(0, 255, 136, 0.2);
-      display: inline-block;
-      padding: 6px 20px;
-      border-radius: 80px;
-      font-size: 18px;
-      font-weight: 600;
-      color: #b5ffd4;
-      backdrop-filter: blur(4px);
-      margin-bottom: 24px;
-      border: 1px solid #3eff9e55;
-    }
-
-    .desc-text {
-      font-size: 18px;
-      color: #cbd5e6;
-      margin: 16px 0;
-      line-height: 1.5;
-    }
-
-    .warning-chip {
-      background: #2a1215;
-      border-left: 5px solid #ff6666;
-      padding: 18px 20px;
-      border-radius: 28px;
-      margin: 24px 0;
-      text-align: left;
-      font-size: 15px;
-      color: #ffcdcd;
-    }
-
-    .recipient-area {
-      background: #0f121fcc;
-      border-radius: 48px;
-      padding: 18px 24px;
-      margin: 20px 0;
-      border: 1px solid #2a3b55;
-    }
-
-    .username-field {
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
       display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    h1 small {
+      font-size: 0.75rem;
+      background: #2d4174;
+      -webkit-text-fill-color: white;
+      padding: 2px 12px;
+      border-radius: 40px;
+      background: #3f5aa0;
+      font-weight: 500;
+      margin-left: 8px;
+    }
+    .sub {
+      opacity: 0.75;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+      border-left: 3px solid #4f7eff;
+      padding-left: 12px;
+    }
+    .balance-box {
+      background: #111e33;
+      border-radius: 40px;
+      padding: 16px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #3f5e99;
+      margin-bottom: 24px;
       flex-wrap: wrap;
       gap: 12px;
-      align-items: center;
-      justify-content: center;
-      margin-top: 12px;
     }
-
-    .username-field input {
-      flex: 2;
-      min-width: 200px;
-      padding: 14px 20px;
-      font-size: 18px;
-      background: #010b14;
-      border: 1.5px solid #2f5a7a;
-      border-radius: 60px;
-      color: white;
-      outline: none;
-      transition: all 0.2s;
+    .balance-label {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.7;
     }
-
-    .username-field input:focus {
-      border-color: #2affb6;
-      box-shadow: 0 0 8px #2affb680;
+    .balance-value {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #ffd966;
+      line-height: 1;
     }
-
-    .avatar-preview-sm {
+    .balance-value span {
+      font-size: 1rem;
+      color: #9bb3df;
+      font-weight: 400;
+    }
+    .btn-grid {
       display: flex;
-      align-items: center;
-      gap: 20px;
-      justify-content: center;
+      gap: 12px;
       flex-wrap: wrap;
-      margin: 15px 0 5px;
+      margin-bottom: 32px;
     }
-
-    .avatar-img {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #2affb6;
-      background: #11161f;
-    }
-
-    .amount-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      justify-content: center;
-      margin: 28px 0;
-    }
-
-    .amount-card {
-      background: #11161f;
-      border-radius: 40px;
-      padding: 12px 22px;
-      cursor: pointer;
-      transition: 0.2s;
-      border: 1px solid #2c4c6e;
-      text-align: center;
-      min-width: 130px;
-    }
-
-    .amount-card.selected {
-      background: #1f6e8c;
-      border-color: #9efff0;
-      box-shadow: 0 0 12px #00e0ff80;
-      transform: scale(1.02);
-    }
-
-    .robux-amount {
-      font-size: 26px;
-      font-weight: bold;
-      color: #fff;
-    }
-
-    .price {
-      font-size: 15px;
-      color: #aad0ff;
-    }
-
-    .bonus-badge {
-      font-size: 12px;
-      background: #ffb34733;
-      border-radius: 40px;
-      padding: 3px 10px;
-      display: inline-block;
-      margin-top: 6px;
-    }
-
-    button {
-      background: linear-gradient(95deg, #00b8ff, #0066cc);
+    .btn {
+      background: #1f3a70;
       border: none;
-      padding: 14px 32px;
-      font-size: 18px;
-      font-weight: bold;
       border-radius: 60px;
-      color: white;
-      cursor: pointer;
-      transition: 0.2s;
-      margin: 12px 8px;
-      box-shadow: 0 5px 12px rgba(0,0,0,0.4);
-    }
-
-    button.secondary {
-      background: #2c3e4e;
-    }
-
-    button:hover {
-      transform: scale(1.02);
-      filter: brightness(1.08);
-    }
-
-    .success-animation {
-      text-align: center;
-    }
-
-    .success-icon {
-      font-size: 70px;
-      background: #00aa5e;
-      width: 100px;
-      height: 100px;
-      line-height: 100px;
-      border-radius: 50%;
-      margin: 20px auto;
-      box-shadow: 0 0 20px #3eff9e;
-    }
-
-    .detail-card {
-      background: #0c1120;
-      border-radius: 40px;
-      padding: 24px;
-      text-align: left;
-      margin: 24px 0;
-    }
-
-    hr {
-      border-color: #2a3a55;
-      margin: 12px 0;
-    }
-
-    .legal-foot {
-      font-size: 11px;
-      color: #5c6e82;
-      margin-top: 32px;
-      text-align: center;
-    }
-
-    @media (max-width: 550px) {
-      .sim-card { padding: 24px 18px; }
-      h1 { font-size: 36px; }
-      .amount-card { min-width: 100px; }
-    }
-  </style>
-</head>
-<body>
-
-<div class="sim-card" id="appContainer">
-  <!-- PAGE 1 - Landing / Intro -->
-  <div id="pageLanding" class="page active-page">
-    <h1>🎁 Gift Robux</h1>
-    <div class="badge-glow">✨ +25% BONUS on first gift ✨</div>
-    <p class="desc-text">Send Robux directly to any Roblox player — instant delivery simulation.<br>No gift cards, just pure fun.</p>
-    
-    <div class="warning-chip">
-      ⚠️ <strong>D s only</strong> — this is an interactive preview. Real Robux checkout.
-    </div>
-
-    <button id="startGiftBtn">🌟 Start Gifting →</button>
-    
-    <div class="legal-foot">
-      Roblox, Robux and the respective marks are trademarks of Roblox Corp. This is a fan-made interactive simulation.
-    </div>
-  </div>
-
-  <!-- PAGE 2 - Username & recipient -->
-  <div id="pageRecipient" class="page">
-    <h1>👤 Who gets the gift?</h1>
-    <div class="recipient-area">
-      <div class="username-field">
-        <input type="text" id="recipientUsername" placeholder="Roblox username (e.g., Builderman)" autocomplete="off">
-      </div>
-      <div class="avatar-preview-sm" id="avatarPreviewZone">
-        <img id="avatarMini" class="avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23222'/%3E%3C/svg%3E" alt="avatar">
-        <span id="recipientStatus" style="color:#8aaec0;">✨ Enter a username</span>
-      </div>
-    </div>
-    <p class="desc-text" style="font-size:15px;">We'll try to fetch avatar preview (Roblox public API) — real gift would send to this user.</p>
-    <button id="continueToAmountBtn" class="secondary">Continue →</button>
-    <button id="backToLandingBtn" class="secondary" style="background:#2a3a4a;">Back</button>
-  </div>
-
-  <!-- PAGE 3 - Select amount + bonus -->
-  <div id="pageAmount" class="page">
-    <h1>💰 Choose amount</h1>
-    <div class="amount-grid" id="amountOptionsContainer"></div>
-    <div id="bonusInfo" style="background:#0e1722; border-radius:60px; padding:10px; margin: 10px 0; font-size:15px;"></div>
-    <button id="confirmAmountBtn">Confirm & Review →</button>
-    <button id="backToRecipientBtn" class="secondary">Back</button>
-  </div>
-
-  <!-- PAGE 4 - Review & final send simulation -->
-  <div id="pageReview" class="page">
-    <h1>📦 Review your gift</h1>
-    <div class="detail-card">
-      <p><strong>🎮 Recipient:</strong> <span id="reviewUsername">—</span></p>
-      <p><strong>🟣 Robux amount:</strong> <span id="reviewRobux">0</span> Robux</p>
-      <p><strong>🎁 Bonus (25%):</strong> <span id="reviewBonus">0</span> extra Robux</p>
-      <p><strong>✨ Total delivered:</strong> <span id="reviewTotal" style="color:#6effb0; font-weight:bold;">0</span> Robux</p>
-      <hr>
-      <p><strong>💵 Estimated value:</strong> <span id="reviewPrice">$0.00</span></p>
-      <p style="font-size:14px; color:#8eb9d0;">Demo only — no actual charge.</p>
-    </div>
-    <button id="finalSendBtn">🚀 Send Gift (simulate)</button>
-    <button id="backToAmountBtnReview" class="secondary">Back</button>
-  </div>
-
-  <!-- PAGE 5 - Success + arrival timeline -->
-  <div id="pageSuccess" class="page">
-    <div class="success-animation">
-      <div class="success-icon">🎉</div>
-      <h2 style="color:#7effb0;">Gift Sent!</h2>
-      <p class="desc-text"><strong id="successUsername">User</strong> will receive <strong id="successTotal">0</strong> Robux <br> (including bonus).</p>
-      <div class="detail-card" style="text-align:center;">
-        <p>📬 <strong>Delivery status:</strong> Processing</p>
-        <p>⏱️ Estimated arrival: <strong>within 24 hours</strong> (demo simulation)</p>
-        <p style="font-size:13px;">✨ In real Roblox gifts, Robux appear instantly after purchase.</p>
-      </div>
-      <button id="newGiftBtn">🎁 Send another gift</button>
-    </div>
-  </div>
-</div>
-
-<script>
-  // ---------- DATA ----------
-  const amountPresets = [
-    { robux: 400, price: 4.99, bonus: 100 },
-    { robux: 800, price: 9.99, bonus: 200 },
-    { robux: 1700, price: 19.99, bonus: 425 },
-    { robux: 4500, price: 49.99, bonus: 1125 },
-    { robux: 10000, price: 99.99, bonus: 2500 }
-  ];
-
-  // state
-  let currentRecipient = "";
-  let selectedAmountIndex = 0;     // default 400 Robux
-  let selectedRobux = 400;
-  let selectedPrice = 4.99;
-  let selectedBonus = 100;
-  let avatarImageUrl = null;
-
-  // DOM elements
-  const pages = {
-    landing: document.getElementById('pageLanding'),
-    recipient: document.getElementById('pageRecipient'),
-    amount: document.getElementById('pageAmount'),
-    review: document.getElementById('pageReview'),
-    success: document.getElementById('pageSuccess')
-  };
-
-  function showPage(pageName) {
-    Object.keys(pages).forEach(key => {
-      pages[key].classList.remove('active-page');
-    });
-    pages[pageName].classList.add('active-page');
-  }
-
-  // update selected amount details
-  function updateSelectedAmount(index) {
-    selectedAmountIndex = index;
-    const preset = amountPresets[index];
-    selectedRobux = preset.robux;
-    selectedPrice = preset.price;
-    selectedBonus = preset.bonus;
-    renderAmountOptions();
-    renderBonusInfo();
-  }
-
-  function renderAmountOptions() {
-    const container = document.getElementById('amountOptionsContainer');
-    if (!container) return;
-    container.innerHTML = '';
-    amountPresets.forEach((item, idx) => {
-      const isSelected = idx === selectedAmountIndex;
-      const card = document.createElement('div');
-      card.className = `amount-card ${isSelected ? 'selected' : ''}`;
-      card.innerHTML = `
-        <div class="robux-amount">${item.robux.toLocaleString()} Robux</div>
-        <div class="price">$${item.price.toFixed(2)}</div>
-        <div class="bonus-badge">+${item.bonus} bonus</div>
-      `;
-      card.addEventListener('click', () => {
-        updateSelectedAmount(idx);
-      });
-      container.appendChild(card);
-    });
-  }
-
-  function renderBonusInfo() {
-    const bonusDiv = document.getElementById('bonusInfo');
-    if (bonusDiv) {
-      const totalWithBonus = selectedRobux + selectedBonus;
-      bonusDiv.innerHTML = `🎁 <strong>+25% BONUS ACTIVE!</strong> You'll send ${selectedRobux} Robux + ${selectedBonus} bonus = <strong style="color:#aaffcc;">${totalWithBonus} total Robux</strong> to your friend.`;
-    }
-  }
-
-  // fetch Roblox avatar using public username -> ID -> thumbnail (graceful)
-  async function fetchAvatarForUser(username) {
-    if (!username || username.length < 2) return null;
-    try {
-      // resolve username to ID via Roblox API
-      const userRes = await fetch('https://users.roblox.com/v1/usernames/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usernames: [username] })
-      });
-      const userData = await userRes.json();
-      if (!userData.data || userData.data.length === 0) return null;
-      const userId = userData.data[0].id;
-      // fetch headshot thumbnail
-      const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=100x100&format=Png&isCircular=false`);
-      const thumbJson = await thumbRes.json();
-      if (thumbJson.data && thumbJson.data[0] && thumbJson.data[0].imageUrl) {
-        return thumbJson.data[0].imageUrl;
-      }
-      return null;
-    } catch (err) {
-      console.warn("Avatar fetch error (demo friendly):", err);
-      return null;
-    }
-  }
-
-  // update preview on recipient page
-  const recipientInput = document.getElementById('recipientUsername');
-  const avatarMini = document.getElementById('avatarMini');
-  const recipientStatusSpan = document.getElementById('recipientStatus');
-  let avatarDebounce;
-
-  function updateAvatarPreview() {
-    const username = recipientInput.value.trim();
-    if (username.length < 3) {
-      avatarMini.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23222'/%3E%3C/svg%3E";
-      recipientStatusSpan.innerText = '👤 Enter at least 3 characters';
-      avatarImageUrl = null;
-      return;
-    }
-    recipientStatusSpan.innerText = '🔄 Looking up Roblox user...';
-    clearTimeout(avatarDebounce);
-    avatarDebounce = setTimeout(async () => {
-      const imgUrl = await fetchAvatarForUser(username);
-      if (imgUrl) {
-        avatarMini.src = imgUrl;
-        avatarImageUrl = imgUrl;
-        recipientStatusSpan.innerText = `✅ ${username} — ready to gift!`;
-      } else {
-        avatarMini.src = "https://www.roblox.com/favicon.ico"; // fallback style
-        recipientStatusSpan.innerText = `⚠️ Couldn't load avatar, but you can still gift ${username}`;
-        avatarImageUrl = null;
-      }
-    }, 500);
-  }
-
-  recipientInput.addEventListener('input', updateAvatarPreview);
-
-  // update review page data
-  function updateReviewPage() {
-    const recipientName = recipientInput.value.trim() || "Demo Player";
-    const totalRobux = selectedRobux + selectedBonus;
-    document.getElementById('reviewUsername').innerText = recipientName;
-    document.getElementById('reviewRobux').innerText = selectedRobux.toLocaleString();
-    document.getElementById('reviewBonus').innerText = selectedBonus.toLocaleString();
-    document.getElementById('reviewTotal').innerText = totalRobux.toLocaleString();
-    document.getElementById('reviewPrice').innerText = `$${selectedPrice.toFixed(2)}`;
-  }
-
-  // final success update
-  function updateSuccessPage() {
-    const recipientName = recipientInput.value.trim() || "your friend";
-    const totalRobux = selectedRobux + selectedBonus;
-    document.getElementById('successUsername').innerText = recipientName;
-    document.getElementById('successTotal').innerText = totalRobux.toLocaleString();
-  }
-
-  // navigation and validation
-  function validateRecipientAndProceed() {
-    const username = recipientInput.value.trim();
-    if (username.length < 3) {
-      recipientStatusSpan.innerText = '❌ Please enter a valid Roblox username (min 3 characters)';
-      return false;
-    }
-    currentRecipient = username;
-    showPage('amount');
-    return true;
-  }
-
-  // event binding
-  document.getElementById('startGiftBtn').addEventListener('click', () => {
-    showPage('recipient');
-  });
-  document.getElementById('backToLandingBtn').addEventListener('click', () => {
-    showPage('landing');
-  });
-  document.getElementById('continueToAmountBtn').addEventListener('click', () => {
-    validateRecipientAndProceed();
-  });
-  document.getElementById('backToRecipientBtn').addEventListener('click', () => {
-    showPage('recipient');
-  });
-  document.getElementById('confirmAmountBtn').addEventListener('click', () => {
-    if (!recipientInput.value.trim()) {
-      alert("Recipient username is missing, please go back and set it.");
-      showPage('recipient');
-      return;
-    }
-    updateReviewPage();
-    showPage('review');
-  });
-  document.getElementById('backToAmountBtnReview').addEventListener('click', () => {
-    showPage('amount');
-  });
-  document.getElementById('finalSendBtn').addEventListener('click', () => {
-    if (!recipientInput.value.trim()) {
-      alert("No recipient set, restarting flow.");
-      showPage('landing');
-      return;
-    }
-    updateSuccessPage();
-    showPage('success');
-  });
-  document.getElementById('newGiftBtn').addEventListener('click', () => {
-    // reset but keep default recipient? reset username field but keep demo fresh
-    recipientInput.value = "";
-    avatarMini.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23222'/%3E%3C/svg%3E";
-    recipientStatusSpan.innerText = '✨ Enter a username';
-    selectedAmountIndex = 0;
-    selectedRobux = 400;
-    selectedPrice = 4.99;
-    selectedBonus = 100;
-    renderAmountOptions();
-    renderBonusInfo();
-    showPage('landing');
-  });
-
-  // extra back buttons for consistency
-  document.getElementById('backToRecipientBtn')?.addEventListener('click', () => showPage('recipient'));
-  
-  // init amounts
-  renderAmountOptions();
-  renderBonusInfo();
-  
-  // small style fix: update amount grid selection after dynamic rerender
-  function rerenderAmountSelection() {
-    renderAmountOptions();
-    renderBonusInfo();
-  }
-  window.updateSelectedAmount = updateSelectedAmount;
-  updateSelectedAmount(0); // initial
-
-  // bonus tooltip
-  console.log("Roblox gift simulation ready — all interactions are demo only");
-</script>
-</body>
-</html>      display: none;
-      animation: floatIn 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-    }
-
-    .active {
-      display: block;
-    }
-
-    @keyframes floatIn {
-      0% { opacity: 0; transform: translateY(18px) scale(0.97); }
-      100% { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    h1 {
-      font-size: 52px;
-      font-weight: 800;
-      background: linear-gradient(125deg, #FFFFFF, #3effc0, #1ecbe8);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      margin-bottom: 12px;
-      letter-spacing: -0.5px;
-    }
-
-    .glow-badge {
-      background: rgba(0, 255, 160, 0.18);
-      border: 1px solid #4effb055;
-      display: inline-block;
-      padding: 6px 22px;
-      border-radius: 60px;
-      font-size: 18px;
+      padding: 14px 24px;
       font-weight: 600;
-      color: #c6ffe0;
-      margin-bottom: 24px;
-    }
-
-    .desc {
-      font-size: 18px;
-      color: #cbd8f0;
-      line-height: 1.5;
-      margin: 16px 0;
-    }
-
-    .recipient-card {
-      background: #0b1020cc;
-      border-radius: 44px;
-      padding: 24px;
-      margin: 28px 0;
-      border: 1px solid #2c506e;
-    }
-
-    .username-field {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    .username-field input {
-      flex: 2;
-      min-width: 220px;
-      padding: 16px 24px;
-      font-size: 18px;
-      background: #010a14;
-      border: 1.5px solid #2d6185;
-      border-radius: 60px;
+      font-size: 1.1rem;
       color: white;
-      outline: none;
-      transition: 0.2s;
-      font-weight: 500;
-    }
-
-    .username-field input:focus {
-      border-color: #2affb0;
-      box-shadow: 0 0 10px #2affb070;
-    }
-
-    .avatar-preview-area {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-top: 12px;
+      gap: 8px;
+      flex: 1 1 auto;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #0b1426, 0 6px 12px rgba(0,0,0,0.4);
+      transition: all 0.07s ease;
+      border: 1px solid rgba(255,255,255,0.08);
     }
-
-    .avatar-img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #2affc0;
-      background: #11161f;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    .btn:active {
+      transform: translateY(5px);
+      box-shadow: 0 1px 0 #0b1426, 0 6px 12px rgba(0,0,0,0.4);
     }
-
-    .status-message {
-      font-size: 15px;
-      background: #11161fcc;
-      padding: 8px 20px;
-      border-radius: 60px;
-      color: #b8d0ff;
+    .btn-primary {
+      background: #2f4eb5;
+      background: linear-gradient(145deg, #3f62d0, #2b44a0);
     }
-
-    .amount-grid {
+    .btn-secondary {
+      background: #2a3858;
+    }
+    .stats-panel {
+      background: #0f1a2b;
+      border-radius: 28px;
+      padding: 18px;
+      margin-bottom: 24px;
+      border: 1px solid #3f5e99;
+    }
+    .leaderboard-header {
       display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      justify-content: center;
-      margin: 32px 0;
+      justify-content: space-between;
+      font-weight: 600;
+      color: #adc4ff;
+      padding: 8px 8px 16px 8px;
+      border-bottom: 1px solid #2e4570;
+      margin-bottom: 12px;
     }
-
-    .amount-option {
-      background: #11161f;
-      border-radius: 48px;
-      padding: 14px 22px;
-      cursor: pointer;
-      transition: 0.2s;
-      border: 1px solid #2f6080;
-      text-align: center;
-      min-width: 140px;
+    .leaderboard-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 8px;
+      border-radius: 20px;
+      background: rgba(30, 50, 90, 0.4);
+      margin: 6px 0;
     }
-
-    .amount-option.selected {
-      background: #1a6d8c;
-      border-color: #9efff0;
-      box-shadow: 0 0 14px #00e0ffaa;
-      transform: scale(1.02);
+    .leaderboard-row.first {
+      background: linear-gradient(90deg, #392f1f, #2f4a5f);
+      border: 1px solid #f5c542;
     }
-
-    .robux-num {
-      font-size: 28px;
-      font-weight: bold;
-      color: #fff;
+    .leaderboard-row.second {
+      border: 1px solid #a0b0cc;
     }
-
-    .price-tag {
-      font-size: 15px;
-      color: #bbdcff;
+    .leaderboard-row.third {
+      border: 1px solid #9c7e5c;
     }
-
-    .bonus-chip {
-      font-size: 12px;
-      background: #ffb34744;
-      border-radius: 40px;
+    .prize-badge {
+      background: #1f3452;
       padding: 4px 12px;
-      display: inline-block;
-      margin-top: 8px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 600;
     }
-
-    .bonus-banner {
-      background: #0e1824;
+    .ref-link {
+      background: #0b1426;
+      padding: 16px;
       border-radius: 40px;
-      padding: 12px 18px;
-      margin: 12px 0;
-      font-size: 16px;
-      text-align: center;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 24px 0 16px;
+      border: 1px solid #334e84;
+      font-size: 0.9rem;
+      word-break: break-all;
     }
-
-    button {
-      background: linear-gradient(100deg, #00b8ff, #1f6fcf);
+    .ref-link input {
+      background: transparent;
       border: none;
-      padding: 14px 36px;
-      font-size: 18px;
-      font-weight: bold;
-      border-radius: 60px;
       color: white;
-      cursor: pointer;
-      transition: 0.2s;
-      margin: 12px 8px;
-      box-shadow: 0 5px 12px rgba(0,0,0,0.5);
+      flex: 1;
+      font-size: 0.9rem;
+      outline: none;
     }
-
-    button.secondary {
-      background: #2a4058;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.08);
-    }
-
-    .detail-panel {
-      background: #0c1122;
-      border-radius: 44px;
-      padding: 28px;
-      margin: 24px 0;
-      text-align: left;
-    }
-
-    .success-icon {
-      font-size: 70px;
-      background: #19a86b;
-      width: 110px;
-      height: 110px;
-      line-height: 110px;
-      border-radius: 50%;
-      margin: 20px auto;
-      box-shadow: 0 0 25px #3eff9e;
-    }
-
-    hr {
-      margin: 16px 0;
-      border-color: #2e4a6e;
-    }
-
-    .legal-footer {
-      font-size: 11px;
-      color: #62738b;
+    .footnote {
+      font-size: 0.8rem;
+      opacity: 0.5;
       text-align: center;
-      margin-top: 32px;
+      margin-top: 24px;
     }
-
-    .warning-note {
-      background: #2a1015;
-      border-left: 5px solid #ff7777;
-      padding: 14px 18px;
-      border-radius: 24px;
-      margin: 20px 0;
-      font-size: 14px;
-      color: #ffcfcf;
+    .toast-msg {
+      background: #2aab5e;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 60px;
+      font-weight: 500;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 10px 20px black;
+      transition: opacity 0.2s;
+      z-index: 999;
     }
-
-    @media (max-width: 550px) {
-      .page { padding: 24px 18px; }
-      h1 { font-size: 38px; }
-      .amount-option { min-width: 110px; }
+    .error-toast {
+      background: #c84444;
+    }
+    .reward-daily {
+      background: #1a2b41;
+      border-radius: 28px;
+      padding: 18px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
   </style>
 </head>
 <body>
-<div class="gift-container">
-  <!-- PAGE 1 - LANDING + RECIPIENT INPUT -->
-  <div id="landingPage" class="page active">
-    <h1>🎁 Gift Robux</h1>
-    <div class="glow-badge">✨ +25% EXTRA BONUS ✨</div>
-    <p class="desc">Send Robux directly to any Roblox account — no gift cards, no codes. Instant gifting simulation.</p>
-    
-    <div class="recipient-card">
-      <h2 style="font-size: 24px; margin-bottom: 12px;">👤 Recipient username</h2>
-      <div class="username-field">
-        <input type="text" id="usernameInput" placeholder="e.g., Builderman, Roblox, zunix" autocomplete="off">
-      </div>
-      <div class="avatar-preview-area">
-        <img id="avatarPreview" class="avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23222'/%3E%3C/svg%3E" alt="avatar">
-        <div id="statusMsg" class="status-message">✨ Enter a Roblox username</div>
-      </div>
-    </div>
+<div class="glass-card" id="app">
+  <h1>🪙 ADreward <small>Polygon USDT</small></h1>
+  <div class="sub">⚡ watch ads · earn USDT · leaderboard</div>
 
-    <button id="startGiftingBtn" disabled>🚀 Continue to Amount →</button>
-    <div class="legal-footer">
-      Demo simulation — real Robux purchases only via roblox.com. Fan-made preview.
-    </div>
+  <!-- balance & ref row -->
+  <div class="balance-box">
+    <span class="balance-label">your wallet</span>
+    <span class="balance-value" id="balanceDisplay">0.00000 <span>USDT</span></span>
   </div>
 
-  <!-- PAGE 2 - AMOUNT SELECTION -->
-  <div id="amountPage" class="page">
-    <h1>💰 Choose amount</h1>
-    <div class="bonus-banner" id="bonusText"></div>
-    <div class="amount-grid" id="amountGrid"></div>
-    <button id="reviewBtn">📦 Review & Confirm</button>
-    <button id="backToLandingFromAmount" class="secondary">← Back</button>
+  <!-- main actions: watch ad & daily reward -->
+  <div class="btn-grid">
+    <button class="btn btn-primary" id="watchAdBtn">📺 Watch ad · +0.00005</button>
+    <button class="btn btn-secondary" id="dailyRewardBtn">🎁 Daily (ad) </button>
   </div>
 
-  <!-- PAGE 3 - REVIEW + FINAL SIMULATION -->
-  <div id="reviewPage" class="page">
-    <h1>📋 Review gift</h1>
-    <div class="detail-panel">
-      <p><strong>👤 Recipient:</strong> <span id="reviewUsername">—</span></p>
-      <div style="display: flex; justify-content: center; margin: 12px 0;">
-        <img id="reviewAvatar" class="avatar-img" style="width: 70px; height: 70px;" src="" alt="avatar">
-      </div>
-      <p><strong>🟣 Base Robux:</strong> <span id="reviewBase">0</span> Robux</p>
-      <p><strong>🎁 25% Bonus:</strong> +<span id="reviewBonusAmt">0</span> Robux</p>
-      <p><strong>✨ Total to receive:</strong> <span id="reviewTotal" style="color:#6effb0; font-size: 24px; font-weight: bold;">0</span> Robux</p>
-      <hr>
-      <p><strong>💵 Price (simulated):</strong> $<span id="reviewPrice">0.00</span></p>
-      <div class="warning-note" style="margin-top: 16px;">
-        ⚡ Demo only — no real charge. Official gifts require Roblox checkout.
-      </div>
-    </div>
-    <button id="finalSendBtn">🎉 Send Gift (simulate)</button>
-    <button id="backToAmountFromReview" class="secondary">← Back</button>
+  <!-- daily reward status -->
+  <div class="reward-daily" id="dailyPanel">
+    <span>☀️ daily bonus</span>
+    <span id="dailyStatus">ready (watch ad)</span>
   </div>
 
-  <!-- PAGE 4 - SUCCESS + ARRIVAL -->
-  <div id="successPage" class="page">
-    <div style="text-align: center;">
-      <div class="success-icon">🎉</div>
-      <h2 style="color:#8effb0;">Gift Sent Successfully!</h2>
-      <p class="desc"><span id="successRecipientName">Friend</span> will receive <strong id="successTotalRobux">0</strong> Robux<br>(including +25% bonus)</p>
-      <div class="detail-panel" style="text-align: center;">
-        <p>📬 Status: <strong>Processing → Delivered</strong></p>
-        <p>⏱️ Estimated arrival: <strong>Within 24 hours</strong></p>
-        <p style="font-size:13px; margin-top: 12px;">💡 Real Roblox gifts are instant after official checkout.</p>
-      </div>
-      <button id="newGiftBtn">✨ Send Another Gift</button>
+  <!-- leaderboard with prizes -->
+  <div class="stats-panel">
+    <div class="leaderboard-header">
+      <span>🏆 LEADERBOARD (USDT)</span>
+      <span>prize</span>
+    </div>
+    <div id="leaderboardContainer"></div>
+    <div style="font-size:0.8rem; margin-top:12px; opacity:0.7; text-align:center;">prizes: 1st 0.5 · 2nd 0.3 · 3rd 0.1 (paid via TG)</div>
+  </div>
+
+  <!-- referral system -->
+  <div style="margin: 6px 0 8px">
+    <span>👥 Referral link (20% of their ad earnings)</span>
+  </div>
+  <div class="ref-link">
+    <input type="text" id="refLinkInput" readonly value="loading your link..." />
+    <button class="btn-secondary" style="padding:8px 18px;" id="copyRefBtn">📋 copy</button>
+  </div>
+  <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin:6px 0 12px;">
+    <span>👤 Your referrer: <span id="referrerDisplay">none</span></span>
+    <span>🔄 ref earnings: <span id="refEarningsDisplay">0.00000</span> USDT</span>
+  </div>
+
+  <!-- withdraw section -->
+  <div style="margin-top: 24px; border-top: 1px dashed #2e4c7a; padding-top: 18px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span><strong>💳 withdraw (Polygon USDT)</strong> · min 0.015</span>
+      <button class="btn-secondary" style="padding:8px 18px;" id="withdrawBtn">send to Telegram</button>
+    </div>
+    <div style="margin-top: 12px;">
+      <input type="text" placeholder="your Polygon address (0x...)" id="withdrawAddress" style="background:#0f1a2b; border:1px solid #334e84; border-radius:60px; padding:12px 18px; width:100%; color:white;" />
     </div>
   </div>
+  <div class="footnote">Adexora ads · rewards are tracked locally (demo)</div>
 </div>
 
+<!-- ADEXORA SCRIPT (id=1988) - updated integration code -->
+<script src="https://adexora.com/cdn/ads.js?id=1988"></script>
 <script>
-  // ---------- ROBLOX API HELPERS (Username → ID → Avatar) ----------
-  let currentRecipient = {
-    username: "",
-    userId: null,
-    avatarUrl: null
+(function() {
+  // ---------- CONFIG ----------
+  const AD_REWARD = 0.00005;            // per ad view
+  const DAILY_REWARD = 0.0002;          // daily bonus
+  const MIN_WITHDRAW = 0.015;
+  const REFERRAL_PERCENT = 0.20;         // 20% of direct ad earnings
+  const TELEGRAM_BOT_TOKEN = "8332036966:AAGixJckzC9j2nXmR_6INIdhJDF2b2j9WgY";
+  
+  // Leaderboard prizes
+  const PRIZES = [0.5, 0.3, 0.1];
+
+  // ---------- STATE (模拟持久化) ----------
+  let balance = 0.0;
+  // 用户ID (简单生成)
+  const userId = 'user_' + Math.random().toString(36).substring(2, 10);
+  // 推荐关系: 从url获取ref参数
+  const urlParams = new URLSearchParams(window.location.search);
+  const refParam = urlParams.get('ref');
+  // 我的推荐人 (如果有)
+  let myReferrer = localStorage.getItem('myReferrer') || null;
+  if (refParam && !myReferrer) {
+    // 不能自己推荐自己 (简单防)
+    if (refParam !== userId) {
+      myReferrer = refParam;
+      localStorage.setItem('myReferrer', myReferrer);
+    }
+  }
+
+  // 推荐人存储 earnings
+  let referralEarnings = JSON.parse(localStorage.getItem('refEarnings')) || {};
+  // 个人推荐链接id 就是userId
+  const myRefId = userId;
+
+  // 已观看广告次数 (用于累计)
+  let totalAdsWatched = JSON.parse(localStorage.getItem('totalAds')) || 0;
+
+  // 上次每日领取时间
+  let lastDaily = localStorage.getItem('lastDaily') || null;
+
+  // 推荐给我带来的收益 (作为推荐人)
+  let myRefEarnings = referralEarnings[myRefId] || 0.0;
+
+  // 排行榜数据
+  let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [
+    { id: 'miner_abc', balance: 0.87 },
+    { id: 'crypto_ray', balance: 0.42 },
+    { id: 'block_dev', balance: 0.19 },
+    { id: 'wave_33', balance: 0.06 },
+  ];
+  
+  // 更新或加入当前用户
+  const updateLeaderboardWithCurrent = () => {
+    let found = leaderboard.find(u => u.id === userId);
+    if (found) {
+      found.balance = balance;
+    } else {
+      leaderboard.push({ id: userId, balance: balance });
+    }
+    // 排序取前5展示
+    leaderboard.sort((a,b) => b.balance - a.balance);
+    leaderboard = leaderboard.slice(0, 6);
+    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
   };
 
-  let selectedRobuxPackage = null;
-  let selectedIndex = 0;
+  // 从storage加载余额
+  const savedBalance = localStorage.getItem('userBalance');
+  if (savedBalance) balance = parseFloat(savedBalance);
+  updateLeaderboardWithCurrent();
 
-  const amountPackages = [
-    { robux: 400, price: 4.99, bonus: 100 },
-    { robux: 800, price: 9.99, bonus: 200 },
-    { robux: 1700, price: 19.99, bonus: 425 },
-    { robux: 4500, price: 49.99, bonus: 1125 },
-    { robux: 10000, price: 99.99, bonus: 2500 }
-  ];
+  // 刷新推荐收益显示
+  const refreshRefEarnings = () => {
+    myRefEarnings = referralEarnings[myRefId] || 0.0;
+    document.getElementById('refEarningsDisplay').innerText = myRefEarnings.toFixed(5);
+  };
 
-  // DOM elements
-  const landingPage = document.getElementById('landingPage');
-  const amountPage = document.getElementById('amountPage');
-  const reviewPage = document.getElementById('reviewPage');
-  const successPage = document.getElementById('successPage');
-  const usernameInput = document.getElementById('usernameInput');
-  const avatarPreview = document.getElementById('avatarPreview');
-  const statusMsg = document.getElementById('statusMsg');
-  const startBtn = document.getElementById('startGiftingBtn');
-  const amountGrid = document.getElementById('amountGrid');
-  const bonusTextDiv = document.getElementById('bonusText');
+  // 保存一切
+  const persist = () => {
+    localStorage.setItem('userBalance', balance.toFixed(8));
+    localStorage.setItem('totalAds', totalAdsWatched);
+    localStorage.setItem('refEarnings', JSON.stringify(referralEarnings));
+    updateLeaderboardWithCurrent();
+    refreshRefEarnings();
+    updateUI();
+  };
 
-  function showPage(pageName) {
-    [landingPage, amountPage, reviewPage, successPage].forEach(p => p.classList.remove('active'));
-    if (pageName === 'landing') landingPage.classList.add('active');
-    if (pageName === 'amount') amountPage.classList.add('active');
-    if (pageName === 'review') reviewPage.classList.add('active');
-    if (pageName === 'success') successPage.classList.add('active');
-  }
+  // 广告观看通用逻辑 - 使用正确的Adexora集成模式
+  const processAdReward = (isDaily = false) => {
+    const rewardAmount = isDaily ? DAILY_REWARD : AD_REWARD;
+    
+    // 按照提供的集成代码调用Adexora
+    return window.showAdexora()
+      .then(() => {
+        // ✅ 奖励逻辑在这里执行
+        balance += rewardAmount;
+        totalAdsWatched += 1;
 
-  // Fetch user ID and avatar from Roblox public APIs
-  async function fetchRobloxUserData(username) {
-    if (!username || username.length < 3) return null;
-    try {
-      const userRes = await fetch('https://users.roblox.com/v1/usernames/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usernames: [username] })
-      });
-      const userJson = await userRes.json();
-      if (!userJson.data || userJson.data.length === 0) return null;
-      const userId = userJson.data[0].id;
-      
-      const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=false`);
-      const thumbJson = await thumbRes.json();
-      let avatarUrl = null;
-      if (thumbJson.data && thumbJson.data[0] && thumbJson.data[0].imageUrl) {
-        avatarUrl = thumbJson.data[0].imageUrl;
-      }
-      return { userId, avatarUrl, username: userJson.data[0].name };
-    } catch (err) {
-      console.warn("Roblox API fetch error:", err);
-      return null;
-    }
-  }
-
-  let debounceTimer = null;
-  async function updateRecipientPreview() {
-    const rawUsername = usernameInput.value.trim();
-    if (rawUsername.length < 3) {
-      avatarPreview.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23222'/%3E%3C/svg%3E";
-      statusMsg.innerHTML = "👤 Enter at least 3 characters";
-      startBtn.disabled = true;
-      currentRecipient = { username: "", userId: null, avatarUrl: null };
-      return;
-    }
-
-    statusMsg.innerHTML = "🔍 Looking up Roblox account...";
-    startBtn.disabled = true;
-    try {
-      const data = await fetchRobloxUserData(rawUsername);
-      if (data && data.userId) {
-        currentRecipient = {
-          username: data.username,
-          userId: data.userId,
-          avatarUrl: data.avatarUrl
-        };
-        if (data.avatarUrl) {
-          avatarPreview.src = data.avatarUrl;
-        } else {
-          avatarPreview.src = "https://www.roblox.com/favicon.ico";
+        // 推荐人分成: 如果有推荐人, 将奖励的20% 加到推荐人名下
+        if (myReferrer) {
+          const refBonus = rewardAmount * REFERRAL_PERCENT;
+          if (!referralEarnings[myReferrer]) referralEarnings[myReferrer] = 0;
+          referralEarnings[myReferrer] += refBonus;
         }
-        statusMsg.innerHTML = `✅ ${data.username} — ready to gift!`;
-        startBtn.disabled = false;
-      } else {
-        avatarPreview.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23444'/%3E%3C/svg%3E";
-        statusMsg.innerHTML = "❌ Username not found on Roblox. Try another.";
-        startBtn.disabled = true;
-        currentRecipient = { username: "", userId: null, avatarUrl: null };
-      }
-    } catch (err) {
-      statusMsg.innerHTML = "⚠️ Network error. Try again.";
-      startBtn.disabled = true;
-    }
-  }
 
-  function onUsernameInput() {
-    if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      updateRecipientPreview();
-    }, 500);
-  }
-  usernameInput.addEventListener('input', onUsernameInput);
-
-  function renderAmountOptions() {
-    if (!amountGrid) return;
-    amountGrid.innerHTML = '';
-    amountPackages.forEach((pkg, idx) => {
-      const isSelected = (selectedIndex === idx);
-      const div = document.createElement('div');
-      div.className = `amount-option ${isSelected ? 'selected' : ''}`;
-      const totalBonus = pkg.robux + pkg.bonus;
-      div.innerHTML = `
-        <div class="robux-num">${pkg.robux.toLocaleString()} Robux</div>
-        <div class="price-tag">$${pkg.price.toFixed(2)}</div>
-        <div class="bonus-chip">+${pkg.bonus} bonus → ${totalBonus} total</div>
-      `;
-      div.addEventListener('click', () => {
-        selectedIndex = idx;
-        renderAmountOptions();
-        updateBonusBanner();
+        persist();
+        showToast(isDaily ? `🎉 Daily reward +${DAILY_REWARD} USDT` : `✅ Ad watched! +${AD_REWARD} USDT`);
+        return Promise.resolve();
+      })
+      .catch(e => {
+        // ❌ 错误处理
+        console.warn('Ad error:', e);
+        showToast('❌ Ad failed (please try again)', true);
+        return Promise.reject(e);
       });
-      amountGrid.appendChild(div);
-    });
-    updateBonusBanner();
-  }
+  };
 
-  function updateBonusBanner() {
-    const pkg = amountPackages[selectedIndex];
-    if (bonusTextDiv) {
-      const totalWithBonus = pkg.robux + pkg.bonus;
-      bonusTextDiv.innerHTML = `🎁 <strong>+25% BONUS</strong> — You'll send ${pkg.robux.toLocaleString()} Robux + ${pkg.bonus} extra = <span style="color:#9effc0;">${totalWithBonus.toLocaleString()} total Robux</span> to recipient.`;
-    }
-  }
+  // 界面更新
+  function updateUI() {
+    document.getElementById('balanceDisplay').innerHTML = balance.toFixed(5) + ' <span>USDT</span>';
+    document.getElementById('refLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${myRefId}`;
+    document.getElementById('referrerDisplay').innerText = myReferrer ? myReferrer.slice(0,8)+'…' : 'none';
+    refreshRefEarnings();
 
-  function populateReviewPage() {
-    const pkg = amountPackages[selectedIndex];
-    const total = pkg.robux + pkg.bonus;
-    const displayName = currentRecipient.username || usernameInput.value.trim() || "Unknown Player";
-    document.getElementById('reviewUsername').innerText = displayName;
-    document.getElementById('reviewBase').innerText = pkg.robux.toLocaleString();
-    document.getElementById('reviewBonusAmt').innerText = pkg.bonus.toLocaleString();
-    document.getElementById('reviewTotal').innerText = total.toLocaleString();
-    document.getElementById('reviewPrice').innerText = pkg.price.toFixed(2);
-    const reviewAvatarImg = document.getElementById('reviewAvatar');
-    if (currentRecipient.avatarUrl) {
-      reviewAvatarImg.src = currentRecipient.avatarUrl;
+    // 每日状态显示
+    const dailySpan = document.getElementById('dailyStatus');
+    if (lastDaily) {
+      const last = new Date(lastDaily);
+      const now = new Date();
+      const sameDay = last.toDateString() === now.toDateString();
+      if (sameDay) {
+        dailySpan.innerText = '✅ already collected today';
+      } else {
+        dailySpan.innerText = '⭐ ready (watch ad)';
+      }
     } else {
-      reviewAvatarImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23333'/%3E%3C/svg%3E";
+      dailySpan.innerText = '⭐ ready (watch ad)';
     }
+
+    // 渲染leaderboard
+    const lbContainer = document.getElementById('leaderboardContainer');
+    let htmlStr = '';
+    leaderboard.slice(0, 5).forEach((user, idx) => {
+      let medal = '';
+      let prizeText = '';
+      if (idx === 0) { medal = '🥇'; prizeText = `+${PRIZES[0]} USDT`; }
+      else if (idx === 1) { medal = '🥈'; prizeText = `+${PRIZES[1]} USDT`; }
+      else if (idx === 2) { medal = '🥉'; prizeText = `+${PRIZES[2]} USDT`; }
+      else prizeText = '';
+
+      let rowClass = 'leaderboard-row';
+      if (idx === 0) rowClass += ' first';
+      else if (idx === 1) rowClass += ' second';
+      else if (idx === 2) rowClass += ' third';
+
+      const displayId = user.id === userId ? 'you' : user.id.substring(0,8);
+      htmlStr += `<div class="${rowClass}"><span>${medal} ${displayId}</span> <span><strong>${user.balance.toFixed(5)}</strong> <span class="prize-badge">${prizeText}</span></span></div>`;
+    });
+    lbContainer.innerHTML = htmlStr || '<div>no data</div>';
   }
 
-  function populateSuccessPage() {
-    const pkg = amountPackages[selectedIndex];
-    const total = pkg.robux + pkg.bonus;
-    const recip = currentRecipient.username || usernameInput.value.trim() || "friend";
-    document.getElementById('successRecipientName').innerText = recip;
-    document.getElementById('successTotalRobux').innerText = total.toLocaleString();
+  // 简单toast
+  function showToast(msg, isError = false) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-msg' + (isError ? ' error-toast' : '');
+    toast.innerText = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2800);
   }
 
-  // Event handlers
-  startBtn.addEventListener('click', () => {
-    if (!currentRecipient.username && usernameInput.value.trim().length >= 3 && !currentRecipient.userId) {
-      statusMsg.innerHTML = "Please wait for username verification...";
-      return;
-    }
-    if (!currentRecipient.username && usernameInput.value.trim().length < 3) {
-      statusMsg.innerHTML = "Enter a valid Roblox username first.";
-      return;
-    }
-    showPage('amount');
+  // 发送 withdraw 信息到 telegram bot (模拟)
+  function sendWithdrawToTelegram(address, amount) {
+    const message = `🚀 WITHDRAW REQUEST\nUser: ${userId}\nAddress (Polygon): ${address}\nAmount: ${amount.toFixed(5)} USDT (polygon)\nBalance after: ${(balance-amount).toFixed(5)} USDT\nReferrer: ${myReferrer || 'none'}`;
+    console.log('Telegram message:', message);
+    
+    // 模拟发送到Telegram (由于浏览器CORS限制，实际部署时可能需要后端)
+    showToast('📨 Withdraw info sent to Telegram bot (simulated)', false);
+    
+    // 实际使用时可以取消注释下面的fetch，但需要配置chat_id
+    /*
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        chat_id: 'YOUR_CHAT_ID', // 需要替换为实际的chat_id
+        text: message 
+      })
+    }).catch(e => console.warn('Telegram error:', e));
+    */
+  }
+
+  // ----- 事件绑定 -----
+  window.addEventListener('load', () => {
+    updateUI();
+
+    // 观看广告按钮
+    document.getElementById('watchAdBtn').addEventListener('click', () => {
+      processAdReward(false).catch(() => {});
+    });
+
+    // 每日奖励: 检查是否可领
+    document.getElementById('dailyRewardBtn').addEventListener('click', () => {
+      const now = new Date();
+      if (lastDaily) {
+        const lastDate = new Date(lastDaily);
+        if (lastDate.toDateString() === now.toDateString()) {
+          showToast('⏳ Daily already collected today', true);
+          return;
+        }
+      }
+      // 播放广告然后奖励
+      processAdReward(true).then(() => {
+        lastDaily = new Date().toISOString();
+        localStorage.setItem('lastDaily', lastDaily);
+        updateUI();
+      }).catch(() => {});
+    });
+
+    // 复制推荐链接
+    document.getElementById('copyRefBtn').addEventListener('click', () => {
+      const inp = document.getElementById('refLinkInput');
+      inp.select();
+      navigator.clipboard?.writeText(inp.value).then(() => showToast('📋 Copied!')).catch(() => showToast('press Ctrl+C', false));
+    });
+
+    // 提现
+    document.getElementById('withdrawBtn').addEventListener('click', () => {
+      const address = document.getElementById('withdrawAddress').value.trim();
+      if (!address) {
+        showToast('❌ Enter polygon address', true);
+        return;
+      }
+      if (balance < MIN_WITHDRAW) {
+        showToast(`❌ Minimum 0.015 USDT required. Balance: ${balance.toFixed(5)}`, true);
+        return;
+      }
+      
+      // 提现全部余额
+      const withdrawAmount = balance;
+      sendWithdrawToTelegram(address, withdrawAmount);
+      
+      // 扣款归零
+      balance = 0.0;
+      persist();
+      showToast(`💸 Withdraw of ${withdrawAmount.toFixed(5)} USDT requested`, false);
+    });
   });
 
-  document.getElementById('reviewBtn').addEventListener('click', () => {
-    if (!currentRecipient.username && usernameInput.value.trim().length >= 3 && !currentRecipient.userId) {
-      alert("Please wait for username verification on the previous page.");
-      showPage('landing');
-      return;
-    }
-    if (!currentRecipient.username && usernameInput.value.trim().length < 3) {
-      alert("Please set a recipient username on the first page.");
-      showPage('landing');
-      return;
-    }
-    populateReviewPage();
-    showPage('review');
-  });
-
-  document.getElementById('finalSendBtn').addEventListener('click', () => {
-    if (!currentRecipient.username && usernameInput.value.trim().length < 3) {
-      alert("Recipient missing, returning to start.");
-      showPage('landing');
-      return;
-    }
-    populateSuccessPage();
-    showPage('success');
-  });
-
-  document.getElementById('newGiftBtn').addEventListener('click', () => {
-    usernameInput.value = "";
-    avatarPreview.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23222'/%3E%3C/svg%3E";
-    statusMsg.innerHTML = "✨ Enter a Roblox username";
-    currentRecipient = { username: "", userId: null, avatarUrl: null };
-    startBtn.disabled = true;
-    selectedIndex = 0;
-    renderAmountOptions();
-    showPage('landing');
-  });
-
-  document.getElementById('backToLandingFromAmount').addEventListener('click', () => {
-    showPage('landing');
-  });
-  document.getElementById('backToAmountFromReview').addEventListener('click', () => {
-    showPage('amount');
-  });
-
-  // Initialize
-  renderAmountOptions();
-  selectedIndex = 0;
-  updateBonusBanner();
-  usernameInput.placeholder = "e.g., Roblox, Builderman";
-  statusMsg.innerHTML = "🎮 Try 'Builderman' or any Roblox user";
+  // 初始化刷新
+  refreshRefEarnings();
+  updateUI();
+  persist();
+})();
 </script>
 </body>
 </html>
