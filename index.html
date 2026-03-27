@@ -1,537 +1,353 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Earn & Leaderboard · Adexora</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      background: linear-gradient(145deg, #0b1426 0%, #1a263b 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 16px;
-      color: #e6edff;
-    }
-    .glass-card {
-      background: rgba(18, 28, 50, 0.7);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-radius: 32px;
-      border: 1px solid rgba(90, 140, 255, 0.25);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08);
-      padding: 24px 20px;
-      width: 100%;
-      max-width: 580px;
-    }
-    h1 {
-      font-size: 2.1rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #c0e0ff, #a9c9ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    h1 small {
-      font-size: 0.75rem;
-      background: #2d4174;
-      -webkit-text-fill-color: white;
-      padding: 2px 12px;
-      border-radius: 40px;
-      background: #3f5aa0;
-      font-weight: 500;
-      margin-left: 8px;
-    }
-    .sub {
-      opacity: 0.75;
-      font-size: 0.9rem;
-      margin-bottom: 24px;
-      border-left: 3px solid #4f7eff;
-      padding-left: 12px;
-    }
-    .balance-box {
-      background: #111e33;
-      border-radius: 40px;
-      padding: 16px 22px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid #3f5e99;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .balance-label {
-      font-size: 0.95rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      opacity: 0.7;
-    }
-    .balance-value {
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: #ffd966;
-      line-height: 1;
-    }
-    .balance-value span {
-      font-size: 1rem;
-      color: #9bb3df;
-      font-weight: 400;
-    }
-    .btn-grid {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 32px;
-    }
-    .btn {
-      background: #1f3a70;
-      border: none;
-      border-radius: 60px;
-      padding: 14px 24px;
-      font-weight: 600;
-      font-size: 1.1rem;
-      color: white;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      flex: 1 1 auto;
-      cursor: pointer;
-      box-shadow: 0 6px 0 #0b1426, 0 6px 12px rgba(0,0,0,0.4);
-      transition: all 0.07s ease;
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-    .btn:active {
-      transform: translateY(5px);
-      box-shadow: 0 1px 0 #0b1426, 0 6px 12px rgba(0,0,0,0.4);
-    }
-    .btn-primary {
-      background: #2f4eb5;
-      background: linear-gradient(145deg, #3f62d0, #2b44a0);
-    }
-    .btn-secondary {
-      background: #2a3858;
-    }
-    .stats-panel {
-      background: #0f1a2b;
-      border-radius: 28px;
-      padding: 18px;
-      margin-bottom: 24px;
-      border: 1px solid #3f5e99;
-    }
-    .leaderboard-header {
-      display: flex;
-      justify-content: space-between;
-      font-weight: 600;
-      color: #adc4ff;
-      padding: 8px 8px 16px 8px;
-      border-bottom: 1px solid #2e4570;
-      margin-bottom: 12px;
-    }
-    .leaderboard-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 8px;
-      border-radius: 20px;
-      background: rgba(30, 50, 90, 0.4);
-      margin: 6px 0;
-    }
-    .leaderboard-row.first {
-      background: linear-gradient(90deg, #392f1f, #2f4a5f);
-      border: 1px solid #f5c542;
-    }
-    .leaderboard-row.second {
-      border: 1px solid #a0b0cc;
-    }
-    .leaderboard-row.third {
-      border: 1px solid #9c7e5c;
-    }
-    .prize-badge {
-      background: #1f3452;
-      padding: 4px 12px;
-      border-radius: 30px;
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-    .ref-link {
-      background: #0b1426;
-      padding: 16px;
-      border-radius: 40px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin: 24px 0 16px;
-      border: 1px solid #334e84;
-      font-size: 0.9rem;
-      word-break: break-all;
-    }
-    .ref-link input {
-      background: transparent;
-      border: none;
-      color: white;
-      flex: 1;
-      font-size: 0.9rem;
-      outline: none;
-    }
-    .footnote {
-      font-size: 0.8rem;
-      opacity: 0.5;
-      text-align: center;
-      margin-top: 24px;
-    }
-    .toast-msg {
-      background: #2aab5e;
-      color: white;
-      padding: 12px 18px;
-      border-radius: 60px;
-      font-weight: 500;
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      box-shadow: 0 10px 20px black;
-      transition: opacity 0.2s;
-      z-index: 999;
-    }
-    .error-toast {
-      background: #c84444;
-    }
-    .reward-daily {
-      background: #1a2b41;
-      border-radius: 28px;
-      padding: 18px;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Girls vs Boys - Manual Game</title>
+    <style>
+        * {
+            user-select: none;
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            font-family: 'Arial', 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .game-container {
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 30px 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: center;
+        }
+        .teams {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .team {
+            background: rgba(0,0,0,0.6);
+            border-radius: 30px;
+            padding: 25px 35px;
+            text-align: center;
+            min-width: 220px;
+            transition: transform 0.2s;
+        }
+        .team:active {
+            transform: scale(0.98);
+        }
+        .girls-team {
+            border-bottom: 6px solid #ff69b4;
+            box-shadow: 0 0 20px rgba(255,105,180,0.3);
+        }
+        .boys-team {
+            border-bottom: 6px solid #4169e1;
+            box-shadow: 0 0 20px rgba(65,105,225,0.3);
+        }
+        .team-icon {
+            font-size: 64px;
+            margin-bottom: 10px;
+        }
+        .team-name {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .girls-name { color: #ff69b4; text-shadow: 0 0 10px #ff69b4; }
+        .boys-name { color: #4169e1; text-shadow: 0 0 10px #4169e1; }
+        .score {
+            font-size: 80px;
+            font-weight: bold;
+            margin: 15px 0;
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            padding: 10px;
+        }
+        .girls-score { color: #ff69b4; }
+        .boys-score { color: #4169e1; }
+        .point-btn {
+            font-size: 28px;
+            font-weight: bold;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .girls-btn {
+            background: #ff69b4;
+            color: white;
+            box-shadow: 0 5px 0 #b13b6e;
+        }
+        .girls-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #b13b6e;
+        }
+        .boys-btn {
+            background: #4169e1;
+            color: white;
+            box-shadow: 0 5px 0 #1e3a8a;
+        }
+        .boys-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #1e3a8a;
+        }
+        .timer-section {
+            margin: 25px 0;
+        }
+        .timer {
+            font-size: 68px;
+            font-weight: bold;
+            font-family: monospace;
+            background: rgba(0,0,0,0.8);
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 60px;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+            letter-spacing: 5px;
+        }
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        .ctrl-btn {
+            font-size: 18px;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            background: #2c3e66;
+            color: white;
+            transition: all 0.2s;
+        }
+        .ctrl-btn:active {
+            transform: scale(0.96);
+        }
+        .reset-btn {
+            background: #dc2626;
+        }
+        .winner-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #f5af19, #f12711);
+            color: white;
+            font-size: 56px;
+            font-weight: bold;
+            padding: 40px 80px;
+            border-radius: 60px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.8);
+            z-index: 1000;
+            text-align: center;
+            white-space: nowrap;
+            font-family: 'Arial', sans-serif;
+            border: 3px solid gold;
+            animation: bounce 0.5s ease;
+        }
+        @keyframes bounce {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            80% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        .hidden {
+            display: none;
+        }
+        .round-status {
+            margin-top: 15px;
+            font-size: 20px;
+            color: #ffaa44;
+            font-weight: bold;
+        }
+        @media (max-width: 800px) {
+            .teams { gap: 20px; }
+            .team { padding: 15px 20px; min-width: 160px; }
+            .score { font-size: 48px; }
+            .point-btn { font-size: 20px; padding: 8px 20px; }
+            .timer { font-size: 40px; }
+            .winner-popup { font-size: 32px; padding: 25px 50px; white-space: nowrap; }
+        }
+    </style>
 </head>
 <body>
-<div class="glass-card" id="app">
-  <h1>🪙 ADreward <small>Polygon USDT</small></h1>
-  <div class="sub">⚡ watch ads · earn USDT · leaderboard</div>
+<div class="game-container">
+    <div class="teams">
+        <!-- GIRLS TEAM -->
+        <div class="team girls-team">
+            <div class="team-icon">👧</div>
+            <div class="team-name girls-name">GIRLS</div>
+            <div class="score girls-score" id="girlsScore">0</div>
+            <button class="point-btn girls-btn" id="girlsPlusBtn">+1 POINT</button>
+        </div>
 
-  <!-- balance & ref row -->
-  <div class="balance-box">
-    <span class="balance-label">your wallet</span>
-    <span class="balance-value" id="balanceDisplay">0.00000 <span>USDT</span></span>
-  </div>
-
-  <!-- main actions: watch ad & daily reward -->
-  <div class="btn-grid">
-    <button class="btn btn-primary" id="watchAdBtn">📺 Watch ad · +0.00005</button>
-    <button class="btn btn-secondary" id="dailyRewardBtn">🎁 Daily (ad) </button>
-  </div>
-
-  <!-- daily reward status -->
-  <div class="reward-daily" id="dailyPanel">
-    <span>☀️ daily bonus</span>
-    <span id="dailyStatus">ready (watch ad)</span>
-  </div>
-
-  <!-- leaderboard with prizes -->
-  <div class="stats-panel">
-    <div class="leaderboard-header">
-      <span>🏆 LEADERBOARD (USDT)</span>
-      <span>prize</span>
+        <!-- BOYS TEAM -->
+        <div class="team boys-team">
+            <div class="team-icon">👦</div>
+            <div class="team-name boys-name">BOYS</div>
+            <div class="score boys-score" id="boysScore">0</div>
+            <button class="point-btn boys-btn" id="boysPlusBtn">+1 POINT</button>
+        </div>
     </div>
-    <div id="leaderboardContainer"></div>
-    <div style="font-size:0.8rem; margin-top:12px; opacity:0.7; text-align:center;">prizes: 1st 0.5 · 2nd 0.3 · 3rd 0.1 (paid via TG)</div>
-  </div>
 
-  <!-- referral system -->
-  <div style="margin: 6px 0 8px">
-    <span>👥 Referral link (20% of their ad earnings)</span>
-  </div>
-  <div class="ref-link">
-    <input type="text" id="refLinkInput" readonly value="loading your link..." />
-    <button class="btn-secondary" style="padding:8px 18px;" id="copyRefBtn">📋 copy</button>
-  </div>
-  <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin:6px 0 12px;">
-    <span>👤 Your referrer: <span id="referrerDisplay">none</span></span>
-    <span>🔄 ref earnings: <span id="refEarningsDisplay">0.00000</span> USDT</span>
-  </div>
+    <div class="timer-section">
+        <div class="timer" id="timerDisplay">05:00</div>
+        <div class="round-status" id="roundStatus">Round in progress</div>
+    </div>
 
-  <!-- withdraw section -->
-  <div style="margin-top: 24px; border-top: 1px dashed #2e4c7a; padding-top: 18px;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <span><strong>💳 withdraw (Polygon USDT)</strong> · min 0.015</span>
-      <button class="btn-secondary" style="padding:8px 18px;" id="withdrawBtn">send to Telegram</button>
+    <div class="controls">
+        <button class="ctrl-btn reset-btn" id="resetRoundBtn">🔄 NEW ROUND</button>
     </div>
-    <div style="margin-top: 12px;">
-      <input type="text" placeholder="your Polygon address (0x...)" id="withdrawAddress" style="background:#0f1a2b; border:1px solid #334e84; border-radius:60px; padding:12px 18px; width:100%; color:white;" />
-    </div>
-  </div>
-  <div class="footnote">Adexora ads · rewards are tracked locally (demo)</div>
 </div>
 
-<!-- ADEXORA SCRIPT (id=1988) - updated integration code -->
-<script src="https://adexora.com/cdn/ads.js?id=1988"></script>
+<div id="winnerPopup" class="winner-popup hidden"></div>
+
 <script>
-(function() {
-  // ---------- CONFIG ----------
-  const AD_REWARD = 0.00005;            // per ad view
-  const DAILY_REWARD = 0.0002;          // daily bonus
-  const MIN_WITHDRAW = 0.015;
-  const REFERRAL_PERCENT = 0.20;         // 20% of direct ad earnings
-  const TELEGRAM_BOT_TOKEN = "8332036966:AAGixJckzC9j2nXmR_6INIdhJDF2b2j9WgY";
-  
-  // Leaderboard prizes
-  const PRIZES = [0.5, 0.3, 0.1];
+    // Game state
+    let girls = 0;
+    let boys = 0;
+    let timeLeft = 300; // 5 minutes in seconds
+    let roundActive = true;
+    let timerInterval = null;
 
-  // ---------- STATE (模拟持久化) ----------
-  let balance = 0.0;
-  // 用户ID (简单生成)
-  const userId = 'user_' + Math.random().toString(36).substring(2, 10);
-  // 推荐关系: 从url获取ref参数
-  const urlParams = new URLSearchParams(window.location.search);
-  const refParam = urlParams.get('ref');
-  // 我的推荐人 (如果有)
-  let myReferrer = localStorage.getItem('myReferrer') || null;
-  if (refParam && !myReferrer) {
-    // 不能自己推荐自己 (简单防)
-    if (refParam !== userId) {
-      myReferrer = refParam;
-      localStorage.setItem('myReferrer', myReferrer);
-    }
-  }
+    // DOM elements
+    const girlsScoreEl = document.getElementById('girlsScore');
+    const boysScoreEl = document.getElementById('boysScore');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const roundStatus = document.getElementById('roundStatus');
+    const winnerPopup = document.getElementById('winnerPopup');
 
-  // 推荐人存储 earnings
-  let referralEarnings = JSON.parse(localStorage.getItem('refEarnings')) || {};
-  // 个人推荐链接id 就是userId
-  const myRefId = userId;
-
-  // 已观看广告次数 (用于累计)
-  let totalAdsWatched = JSON.parse(localStorage.getItem('totalAds')) || 0;
-
-  // 上次每日领取时间
-  let lastDaily = localStorage.getItem('lastDaily') || null;
-
-  // 推荐给我带来的收益 (作为推荐人)
-  let myRefEarnings = referralEarnings[myRefId] || 0.0;
-
-  // 排行榜数据
-  let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [
-    { id: 'miner_abc', balance: 0.87 },
-    { id: 'crypto_ray', balance: 0.42 },
-    { id: 'block_dev', balance: 0.19 },
-    { id: 'wave_33', balance: 0.06 },
-  ];
-  
-  // 更新或加入当前用户
-  const updateLeaderboardWithCurrent = () => {
-    let found = leaderboard.find(u => u.id === userId);
-    if (found) {
-      found.balance = balance;
-    } else {
-      leaderboard.push({ id: userId, balance: balance });
-    }
-    // 排序取前5展示
-    leaderboard.sort((a,b) => b.balance - a.balance);
-    leaderboard = leaderboard.slice(0, 6);
-    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
-  };
-
-  // 从storage加载余额
-  const savedBalance = localStorage.getItem('userBalance');
-  if (savedBalance) balance = parseFloat(savedBalance);
-  updateLeaderboardWithCurrent();
-
-  // 刷新推荐收益显示
-  const refreshRefEarnings = () => {
-    myRefEarnings = referralEarnings[myRefId] || 0.0;
-    document.getElementById('refEarningsDisplay').innerText = myRefEarnings.toFixed(5);
-  };
-
-  // 保存一切
-  const persist = () => {
-    localStorage.setItem('userBalance', balance.toFixed(8));
-    localStorage.setItem('totalAds', totalAdsWatched);
-    localStorage.setItem('refEarnings', JSON.stringify(referralEarnings));
-    updateLeaderboardWithCurrent();
-    refreshRefEarnings();
-    updateUI();
-  };
-
-  // 广告观看通用逻辑 - 使用正确的Adexora集成模式
-  const processAdReward = (isDaily = false) => {
-    const rewardAmount = isDaily ? DAILY_REWARD : AD_REWARD;
-    
-    // 按照提供的集成代码调用Adexora
-    return window.showAdexora()
-      .then(() => {
-        // ✅ 奖励逻辑在这里执行
-        balance += rewardAmount;
-        totalAdsWatched += 1;
-
-        // 推荐人分成: 如果有推荐人, 将奖励的20% 加到推荐人名下
-        if (myReferrer) {
-          const refBonus = rewardAmount * REFERRAL_PERCENT;
-          if (!referralEarnings[myReferrer]) referralEarnings[myReferrer] = 0;
-          referralEarnings[myReferrer] += refBonus;
+    // Update UI
+    function updateUI() {
+        girlsScoreEl.textContent = girls;
+        boysScoreEl.textContent = boys;
+        
+        const mins = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        
+        if (!roundActive) {
+            roundStatus.textContent = 'Round ended — click NEW ROUND to start';
+        } else {
+            roundStatus.textContent = 'Round in progress';
         }
-
-        persist();
-        showToast(isDaily ? `🎉 Daily reward +${DAILY_REWARD} USDT` : `✅ Ad watched! +${AD_REWARD} USDT`);
-        return Promise.resolve();
-      })
-      .catch(e => {
-        // ❌ 错误处理
-        console.warn('Ad error:', e);
-        showToast('❌ Ad failed (please try again)', true);
-        return Promise.reject(e);
-      });
-  };
-
-  // 界面更新
-  function updateUI() {
-    document.getElementById('balanceDisplay').innerHTML = balance.toFixed(5) + ' <span>USDT</span>';
-    document.getElementById('refLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${myRefId}`;
-    document.getElementById('referrerDisplay').innerText = myReferrer ? myReferrer.slice(0,8)+'…' : 'none';
-    refreshRefEarnings();
-
-    // 每日状态显示
-    const dailySpan = document.getElementById('dailyStatus');
-    if (lastDaily) {
-      const last = new Date(lastDaily);
-      const now = new Date();
-      const sameDay = last.toDateString() === now.toDateString();
-      if (sameDay) {
-        dailySpan.innerText = '✅ already collected today';
-      } else {
-        dailySpan.innerText = '⭐ ready (watch ad)';
-      }
-    } else {
-      dailySpan.innerText = '⭐ ready (watch ad)';
     }
 
-    // 渲染leaderboard
-    const lbContainer = document.getElementById('leaderboardContainer');
-    let htmlStr = '';
-    leaderboard.slice(0, 5).forEach((user, idx) => {
-      let medal = '';
-      let prizeText = '';
-      if (idx === 0) { medal = '🥇'; prizeText = `+${PRIZES[0]} USDT`; }
-      else if (idx === 1) { medal = '🥈'; prizeText = `+${PRIZES[1]} USDT`; }
-      else if (idx === 2) { medal = '🥉'; prizeText = `+${PRIZES[2]} USDT`; }
-      else prizeText = '';
-
-      let rowClass = 'leaderboard-row';
-      if (idx === 0) rowClass += ' first';
-      else if (idx === 1) rowClass += ' second';
-      else if (idx === 2) rowClass += ' third';
-
-      const displayId = user.id === userId ? 'you' : user.id.substring(0,8);
-      htmlStr += `<div class="${rowClass}"><span>${medal} ${displayId}</span> <span><strong>${user.balance.toFixed(5)}</strong> <span class="prize-badge">${prizeText}</span></span></div>`;
-    });
-    lbContainer.innerHTML = htmlStr || '<div>no data</div>';
-  }
-
-  // 简单toast
-  function showToast(msg, isError = false) {
-    const toast = document.createElement('div');
-    toast.className = 'toast-msg' + (isError ? ' error-toast' : '');
-    toast.innerText = msg;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2800);
-  }
-
-  // 发送 withdraw 信息到 telegram bot (模拟)
-  function sendWithdrawToTelegram(address, amount) {
-    const message = `🚀 WITHDRAW REQUEST\nUser: ${userId}\nAddress (Polygon): ${address}\nAmount: ${amount.toFixed(5)} USDT (polygon)\nBalance after: ${(balance-amount).toFixed(5)} USDT\nReferrer: ${myReferrer || 'none'}`;
-    console.log('Telegram message:', message);
-    
-    // 模拟发送到Telegram (由于浏览器CORS限制，实际部署时可能需要后端)
-    showToast('📨 Withdraw info sent to Telegram bot (simulated)', false);
-    
-    // 实际使用时可以取消注释下面的fetch，但需要配置chat_id
-    /*
-    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        chat_id: 'YOUR_CHAT_ID', // 需要替换为实际的chat_id
-        text: message 
-      })
-    }).catch(e => console.warn('Telegram error:', e));
-    */
-  }
-
-  // ----- 事件绑定 -----
-  window.addEventListener('load', () => {
-    updateUI();
-
-    // 观看广告按钮
-    document.getElementById('watchAdBtn').addEventListener('click', () => {
-      processAdReward(false).catch(() => {});
-    });
-
-    // 每日奖励: 检查是否可领
-    document.getElementById('dailyRewardBtn').addEventListener('click', () => {
-      const now = new Date();
-      if (lastDaily) {
-        const lastDate = new Date(lastDaily);
-        if (lastDate.toDateString() === now.toDateString()) {
-          showToast('⏳ Daily already collected today', true);
-          return;
+    // End round and show winner popup
+    function endRound() {
+        if (!roundActive) return;
+        
+        roundActive = false;
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
         }
-      }
-      // 播放广告然后奖励
-      processAdReward(true).then(() => {
-        lastDaily = new Date().toISOString();
-        localStorage.setItem('lastDaily', lastDaily);
+        
+        let winnerText = '';
+        if (girls > boys) {
+            winnerText = '🏆 GIRLS WIN! 🏆';
+        } else if (boys > girls) {
+            winnerText = '🏆 BOYS WIN! 🏆';
+        } else {
+            winnerText = '🤝 IT\'S A TIE! 🤝';
+        }
+        
+        // Show popup
+        winnerPopup.textContent = winnerText;
+        winnerPopup.classList.remove('hidden');
+        
+        // Auto-hide popup after 5 seconds
+        setTimeout(() => {
+            winnerPopup.classList.add('hidden');
+        }, 5000);
+        
+        roundStatus.textContent = `ROUND OVER! ${winnerText} Click NEW ROUND to start next hunt.`;
         updateUI();
-      }).catch(() => {});
-    });
+    }
 
-    // 复制推荐链接
-    document.getElementById('copyRefBtn').addEventListener('click', () => {
-      const inp = document.getElementById('refLinkInput');
-      inp.select();
-      navigator.clipboard?.writeText(inp.value).then(() => showToast('📋 Copied!')).catch(() => showToast('press Ctrl+C', false));
-    });
+    // Start timer
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        
+        timerInterval = setInterval(() => {
+            if (timeLeft > 0 && roundActive) {
+                timeLeft--;
+                updateUI();
+                
+                if (timeLeft === 0) {
+                    endRound();
+                }
+            } else if (timeLeft === 0) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }, 1000);
+    }
 
-    // 提现
-    document.getElementById('withdrawBtn').addEventListener('click', () => {
-      const address = document.getElementById('withdrawAddress').value.trim();
-      if (!address) {
-        showToast('❌ Enter polygon address', true);
-        return;
-      }
-      if (balance < MIN_WITHDRAW) {
-        showToast(`❌ Minimum 0.015 USDT required. Balance: ${balance.toFixed(5)}`, true);
-        return;
-      }
-      
-      // 提现全部余额
-      const withdrawAmount = balance;
-      sendWithdrawToTelegram(address, withdrawAmount);
-      
-      // 扣款归零
-      balance = 0.0;
-      persist();
-      showToast(`💸 Withdraw of ${withdrawAmount.toFixed(5)} USDT requested`, false);
-    });
-  });
+    // Reset the game (new round)
+    function resetRound() {
+        // Reset scores
+        girls = 0;
+        boys = 0;
+        timeLeft = 300; // 5 minutes
+        roundActive = true;
+        
+        // Clear any existing timer
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        
+        // Hide popup if visible
+        winnerPopup.classList.add('hidden');
+        
+        // Start fresh timer
+        startTimer();
+        
+        // Update UI
+        updateUI();
+        roundStatus.textContent = 'New round started! 5 minutes on the clock.';
+    }
 
-  // 初始化刷新
-  refreshRefEarnings();
-  updateUI();
-  persist();
-})();
+    // Add points
+    function addGirlsPoint() {
+        if (!roundActive) {
+            roundStatus.textContent = 'Round is over! Click NEW ROUND to start.';
+            return;
+        }
+        girls++;
+        updateUI();
+    }
+    
+    function addBoysPoint() {
+        if (!roundActive) {
+            roundStatus.textContent = 'Round is over! Click NEW ROUND to start.';
+            return;
+        }
+        boys++;
+        updateUI();
+    }
+
+    // Event listeners
+    document.getElementById('girlsPlusBtn').addEventListener('click', addGirlsPoint);
+    document.getElementById('boysPlusBtn').addEventListener('click', addBoysPoint);
+    document.getElementById('resetRoundBtn').addEventListener('click', resetRound);
+
+    // Initialize
+    resetRound();
 </script>
 </body>
 </html>
