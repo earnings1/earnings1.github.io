@@ -26,7 +26,6 @@
             border: 1px solid rgba(255,255,255,0.2);
             text-align: center;
         }
-        /* Timer at the top */
         .timer-section {
             margin-bottom: 30px;
         }
@@ -200,14 +199,12 @@
 </head>
 <body>
 <div class="game-container">
-    <!-- TIMER AT THE TOP -->
     <div class="timer-section">
         <div class="timer" id="timerDisplay">01:00</div>
         <div class="round-status" id="roundStatus">Round in progress | 1 minute hunt</div>
     </div>
 
     <div class="teams">
-        <!-- GIRLS TEAM -->
         <div class="team girls-team">
             <div class="team-icon">👧</div>
             <div class="team-name girls-name">GIRLS</div>
@@ -222,7 +219,6 @@
             </div>
         </div>
 
-        <!-- BOYS TEAM -->
         <div class="team boys-team">
             <div class="team-icon">👦</div>
             <div class="team-name boys-name">BOYS</div>
@@ -239,10 +235,7 @@
     </div>
 
     <div class="controls">
-        <button class="ctrl-btn" id="girlsWinBtn">👧 GIRLS WIN ROUND</button>
-        <button class="ctrl-btn" id="boysWinBtn">👦 BOYS WIN ROUND</button>
-        <button class="ctrl-btn reset-btn" id="resetRoundBtn">🔄 NEW ROUND</button>
-        <button class="ctrl-btn" id="resetGameBtn">🔁 RESET ALL WINS</button>
+        <button class="ctrl-btn reset-btn" id="resetGameBtn">🔁 RESET ALL WINS</button>
     </div>
 </div>
 
@@ -254,7 +247,7 @@
     let boysScore = 0;
     let girlsRoundsWon = 0;
     let boysRoundsWon = 0;
-    let timeLeft = 60; // 1 minute in seconds
+    let timeLeft = 60;
     let roundActive = true;
     let timerInterval = null;
 
@@ -294,7 +287,7 @@
         }, 4000);
     }
 
-    // End round and declare winner
+    // End round - automatically add win to winner and reset scores
     function endRound() {
         if (!roundActive) return;
         
@@ -306,34 +299,26 @@
         
         let winnerText = '';
         
+        // Determine winner and add round win
         if (girlsScore > boysScore) {
+            girlsRoundsWon++;
             winnerText = '🏆 GIRLS WIN THIS ROUND! 🏆';
         } else if (boysScore > girlsScore) {
+            boysRoundsWon++;
             winnerText = '🏆 BOYS WIN THIS ROUND! 🏆';
         } else {
             winnerText = '🤝 IT\'S A TIE! NO POINTS AWARDED 🤝';
         }
         
+        // Show popup
         showPopup(winnerText);
-        roundStatus.textContent = `ROUND OVER! ${winnerText} Click NEW ROUND to start next hunt.`;
-        updateUI();
-    }
-
-    // Award win to a team (manual button)
-    function awardWin(team) {
-        if (roundActive) {
-            showPopup('⚠️ End the current round first! Click "NEW ROUND" after.');
-            return;
-        }
         
-        if (team === 'girls') {
-            girlsRoundsWon++;
-            showPopup('👧 GIRLS WIN THE ROUND! +1 ROUND WIN 👧');
-        } else if (team === 'boys') {
-            boysRoundsWon++;
-            showPopup('👦 BOYS WIN THE ROUND! +1 ROUND WIN 👦');
-        }
+        // Reset scores for next round
+        girlsScore = 0;
+        boysScore = 0;
+        
         updateUI();
+        roundStatus.textContent = `ROUND OVER! ${winnerText} Click NEW ROUND to start next hunt.`;
     }
 
     // Start timer
@@ -352,11 +337,11 @@
         }, 1000);
     }
 
-    // Reset round (keep wins, reset scores, start timer)
-    function resetRound() {
+    // Start new round (reset scores, start timer, keep wins)
+    function startNewRound() {
         girlsScore = 0;
         boysScore = 0;
-        timeLeft = 60; // 1 minute
+        timeLeft = 60;
         roundActive = true;
         
         if (timerInterval) {
@@ -414,13 +399,20 @@
     document.getElementById('boysPlus5Btn').addEventListener('click', () => addPoints('boys', 5));
     document.getElementById('boysPlus10Btn').addEventListener('click', () => addPoints('boys', 10));
     
-    document.getElementById('girlsWinBtn').addEventListener('click', () => awardWin('girls'));
-    document.getElementById('boysWinBtn').addEventListener('click', () => awardWin('boys'));
-    document.getElementById('resetRoundBtn').addEventListener('click', resetRound);
     document.getElementById('resetGameBtn').addEventListener('click', resetGame);
+    
+    // Also allow starting a new round after round ends
+    // Add a NEW ROUND button that appears or reuse reset button behavior
+    // I'll add a NEW ROUND button to the controls
+    const newRoundBtn = document.createElement('button');
+    newRoundBtn.textContent = '🔄 NEW ROUND';
+    newRoundBtn.className = 'ctrl-btn';
+    newRoundBtn.style.background = '#2c3e66';
+    newRoundBtn.addEventListener('click', startNewRound);
+    document.querySelector('.controls').prepend(newRoundBtn);
 
     // Initialize
-    resetRound();
+    startNewRound();
 </script>
 </body>
 </html>
