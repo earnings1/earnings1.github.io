@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Girls vs Boys - Manual Game</title>
+    <title>Girls vs Boys - 1 Minute Rounds</title>
     <style>
         * {
             user-select: none;
@@ -26,6 +26,28 @@
             border: 1px solid rgba(255,255,255,0.2);
             text-align: center;
         }
+        /* Timer at the top */
+        .timer-section {
+            margin-bottom: 30px;
+        }
+        .timer {
+            font-size: 68px;
+            font-weight: bold;
+            font-family: monospace;
+            background: rgba(0,0,0,0.8);
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 60px;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+            letter-spacing: 5px;
+        }
+        .round-status {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #ffaa44;
+            font-weight: bold;
+        }
         .teams {
             display: flex;
             gap: 60px;
@@ -38,11 +60,8 @@
             border-radius: 30px;
             padding: 25px 35px;
             text-align: center;
-            min-width: 220px;
+            min-width: 260px;
             transition: transform 0.2s;
-        }
-        .team:active {
-            transform: scale(0.98);
         }
         .girls-team {
             border-bottom: 6px solid #ff69b4;
@@ -73,21 +92,26 @@
         }
         .girls-score { color: #ff69b4; }
         .boys-score { color: #4169e1; }
+        .point-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
         .point-btn {
-            font-size: 28px;
+            font-size: 20px;
             font-weight: bold;
-            padding: 12px 28px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 50px;
+            border-radius: 40px;
             cursor: pointer;
             transition: all 0.2s;
-            margin-top: 10px;
-            font-weight: bold;
         }
         .girls-btn {
             background: #ff69b4;
             color: white;
-            box-shadow: 0 5px 0 #b13b6e;
+            box-shadow: 0 4px 0 #b13b6e;
         }
         .girls-btn:active {
             transform: translateY(2px);
@@ -96,32 +120,30 @@
         .boys-btn {
             background: #4169e1;
             color: white;
-            box-shadow: 0 5px 0 #1e3a8a;
+            box-shadow: 0 4px 0 #1e3a8a;
         }
         .boys-btn:active {
             transform: translateY(2px);
             box-shadow: 0 2px 0 #1e3a8a;
         }
-        .timer-section {
-            margin: 25px 0;
+        .rounds-won {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            font-size: 18px;
         }
-        .timer {
-            font-size: 68px;
+        .rounds-won span {
+            font-size: 28px;
             font-weight: bold;
-            font-family: monospace;
-            background: rgba(0,0,0,0.8);
-            display: inline-block;
-            padding: 15px 30px;
-            border-radius: 60px;
-            color: #ffd700;
-            text-shadow: 0 0 10px #ffd700;
-            letter-spacing: 5px;
         }
+        .girls-won { color: #ff69b4; }
+        .boys-won { color: #4169e1; }
         .controls {
             margin-top: 25px;
             display: flex;
             gap: 20px;
             justify-content: center;
+            flex-wrap: wrap;
         }
         .ctrl-btn {
             font-size: 18px;
@@ -155,7 +177,6 @@
             z-index: 1000;
             text-align: center;
             white-space: nowrap;
-            font-family: 'Arial', sans-serif;
             border: 3px solid gold;
             animation: bounce 0.5s ease;
         }
@@ -167,17 +188,11 @@
         .hidden {
             display: none;
         }
-        .round-status {
-            margin-top: 15px;
-            font-size: 20px;
-            color: #ffaa44;
-            font-weight: bold;
-        }
         @media (max-width: 800px) {
             .teams { gap: 20px; }
-            .team { padding: 15px 20px; min-width: 160px; }
+            .team { padding: 15px 20px; min-width: 220px; }
             .score { font-size: 48px; }
-            .point-btn { font-size: 20px; padding: 8px 20px; }
+            .point-btn { font-size: 16px; padding: 8px 14px; }
             .timer { font-size: 40px; }
             .winner-popup { font-size: 32px; padding: 25px 50px; white-space: nowrap; }
         }
@@ -185,13 +200,26 @@
 </head>
 <body>
 <div class="game-container">
+    <!-- TIMER AT THE TOP -->
+    <div class="timer-section">
+        <div class="timer" id="timerDisplay">01:00</div>
+        <div class="round-status" id="roundStatus">Round in progress | 1 minute hunt</div>
+    </div>
+
     <div class="teams">
         <!-- GIRLS TEAM -->
         <div class="team girls-team">
             <div class="team-icon">👧</div>
             <div class="team-name girls-name">GIRLS</div>
             <div class="score girls-score" id="girlsScore">0</div>
-            <button class="point-btn girls-btn" id="girlsPlusBtn">+1 POINT</button>
+            <div class="point-buttons">
+                <button class="point-btn girls-btn" id="girlsPlus1Btn">+1</button>
+                <button class="point-btn girls-btn" id="girlsPlus5Btn">+5</button>
+                <button class="point-btn girls-btn" id="girlsPlus10Btn">+10</button>
+            </div>
+            <div class="rounds-won">
+                🏆 ROUNDS WON: <span class="girls-won" id="girlsRoundsWon">0</span>
+            </div>
         </div>
 
         <!-- BOYS TEAM -->
@@ -199,17 +227,22 @@
             <div class="team-icon">👦</div>
             <div class="team-name boys-name">BOYS</div>
             <div class="score boys-score" id="boysScore">0</div>
-            <button class="point-btn boys-btn" id="boysPlusBtn">+1 POINT</button>
+            <div class="point-buttons">
+                <button class="point-btn boys-btn" id="boysPlus1Btn">+1</button>
+                <button class="point-btn boys-btn" id="boysPlus5Btn">+5</button>
+                <button class="point-btn boys-btn" id="boysPlus10Btn">+10</button>
+            </div>
+            <div class="rounds-won">
+                🏆 ROUNDS WON: <span class="boys-won" id="boysRoundsWon">0</span>
+            </div>
         </div>
     </div>
 
-    <div class="timer-section">
-        <div class="timer" id="timerDisplay">05:00</div>
-        <div class="round-status" id="roundStatus">Round in progress</div>
-    </div>
-
     <div class="controls">
+        <button class="ctrl-btn" id="girlsWinBtn">👧 GIRLS WIN ROUND</button>
+        <button class="ctrl-btn" id="boysWinBtn">👦 BOYS WIN ROUND</button>
         <button class="ctrl-btn reset-btn" id="resetRoundBtn">🔄 NEW ROUND</button>
+        <button class="ctrl-btn" id="resetGameBtn">🔁 RESET ALL WINS</button>
     </div>
 </div>
 
@@ -217,23 +250,29 @@
 
 <script>
     // Game state
-    let girls = 0;
-    let boys = 0;
-    let timeLeft = 300; // 5 minutes in seconds
+    let girlsScore = 0;
+    let boysScore = 0;
+    let girlsRoundsWon = 0;
+    let boysRoundsWon = 0;
+    let timeLeft = 60; // 1 minute in seconds
     let roundActive = true;
     let timerInterval = null;
 
     // DOM elements
     const girlsScoreEl = document.getElementById('girlsScore');
     const boysScoreEl = document.getElementById('boysScore');
+    const girlsRoundsEl = document.getElementById('girlsRoundsWon');
+    const boysRoundsEl = document.getElementById('boysRoundsWon');
     const timerDisplay = document.getElementById('timerDisplay');
     const roundStatus = document.getElementById('roundStatus');
     const winnerPopup = document.getElementById('winnerPopup');
 
     // Update UI
     function updateUI() {
-        girlsScoreEl.textContent = girls;
-        boysScoreEl.textContent = boys;
+        girlsScoreEl.textContent = girlsScore;
+        boysScoreEl.textContent = boysScore;
+        girlsRoundsEl.textContent = girlsRoundsWon;
+        boysRoundsEl.textContent = boysRoundsWon;
         
         const mins = Math.floor(timeLeft / 60);
         const secs = timeLeft % 60;
@@ -242,11 +281,20 @@
         if (!roundActive) {
             roundStatus.textContent = 'Round ended — click NEW ROUND to start';
         } else {
-            roundStatus.textContent = 'Round in progress';
+            roundStatus.textContent = 'Round in progress | 1 minute hunt';
         }
     }
 
-    // End round and show winner popup
+    // Show popup message
+    function showPopup(message) {
+        winnerPopup.textContent = message;
+        winnerPopup.classList.remove('hidden');
+        setTimeout(() => {
+            winnerPopup.classList.add('hidden');
+        }, 4000);
+    }
+
+    // End round and declare winner
     function endRound() {
         if (!roundActive) return;
         
@@ -257,24 +305,34 @@
         }
         
         let winnerText = '';
-        if (girls > boys) {
-            winnerText = '🏆 GIRLS WIN! 🏆';
-        } else if (boys > girls) {
-            winnerText = '🏆 BOYS WIN! 🏆';
+        
+        if (girlsScore > boysScore) {
+            winnerText = '🏆 GIRLS WIN THIS ROUND! 🏆';
+        } else if (boysScore > girlsScore) {
+            winnerText = '🏆 BOYS WIN THIS ROUND! 🏆';
         } else {
-            winnerText = '🤝 IT\'S A TIE! 🤝';
+            winnerText = '🤝 IT\'S A TIE! NO POINTS AWARDED 🤝';
         }
         
-        // Show popup
-        winnerPopup.textContent = winnerText;
-        winnerPopup.classList.remove('hidden');
-        
-        // Auto-hide popup after 5 seconds
-        setTimeout(() => {
-            winnerPopup.classList.add('hidden');
-        }, 5000);
-        
+        showPopup(winnerText);
         roundStatus.textContent = `ROUND OVER! ${winnerText} Click NEW ROUND to start next hunt.`;
+        updateUI();
+    }
+
+    // Award win to a team (manual button)
+    function awardWin(team) {
+        if (roundActive) {
+            showPopup('⚠️ End the current round first! Click "NEW ROUND" after.');
+            return;
+        }
+        
+        if (team === 'girls') {
+            girlsRoundsWon++;
+            showPopup('👧 GIRLS WIN THE ROUND! +1 ROUND WIN 👧');
+        } else if (team === 'boys') {
+            boysRoundsWon++;
+            showPopup('👦 BOYS WIN THE ROUND! +1 ROUND WIN 👦');
+        }
         updateUI();
     }
 
@@ -290,61 +348,76 @@
                 if (timeLeft === 0) {
                     endRound();
                 }
-            } else if (timeLeft === 0) {
-                clearInterval(timerInterval);
-                timerInterval = null;
             }
         }, 1000);
     }
 
-    // Reset the game (new round)
+    // Reset round (keep wins, reset scores, start timer)
     function resetRound() {
-        // Reset scores
-        girls = 0;
-        boys = 0;
-        timeLeft = 300; // 5 minutes
+        girlsScore = 0;
+        boysScore = 0;
+        timeLeft = 60; // 1 minute
         roundActive = true;
         
-        // Clear any existing timer
         if (timerInterval) {
             clearInterval(timerInterval);
             timerInterval = null;
         }
         
-        // Hide popup if visible
-        winnerPopup.classList.add('hidden');
-        
-        // Start fresh timer
         startTimer();
-        
-        // Update UI
         updateUI();
-        roundStatus.textContent = 'New round started! 5 minutes on the clock.';
+        roundStatus.textContent = 'New round started! 1 minute on the clock.';
     }
 
-    // Add points
-    function addGirlsPoint() {
-        if (!roundActive) {
-            roundStatus.textContent = 'Round is over! Click NEW ROUND to start.';
-            return;
+    // Reset everything (wins + scores)
+    function resetGame() {
+        girlsScore = 0;
+        boysScore = 0;
+        girlsRoundsWon = 0;
+        boysRoundsWon = 0;
+        timeLeft = 60;
+        roundActive = true;
+        
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
         }
-        girls++;
+        
+        startTimer();
         updateUI();
+        roundStatus.textContent = 'Game reset! New round started.';
+        showPopup('🔄 GAME FULLY RESET 🔄');
     }
-    
-    function addBoysPoint() {
+
+    // Add points (checks if round is active)
+    function addPoints(team, points) {
         if (!roundActive) {
             roundStatus.textContent = 'Round is over! Click NEW ROUND to start.';
+            showPopup('⚠️ Round is over! Start a new round first.');
             return;
         }
-        boys++;
+        
+        if (team === 'girls') {
+            girlsScore += points;
+        } else if (team === 'boys') {
+            boysScore += points;
+        }
         updateUI();
     }
 
     // Event listeners
-    document.getElementById('girlsPlusBtn').addEventListener('click', addGirlsPoint);
-    document.getElementById('boysPlusBtn').addEventListener('click', addBoysPoint);
+    document.getElementById('girlsPlus1Btn').addEventListener('click', () => addPoints('girls', 1));
+    document.getElementById('girlsPlus5Btn').addEventListener('click', () => addPoints('girls', 5));
+    document.getElementById('girlsPlus10Btn').addEventListener('click', () => addPoints('girls', 10));
+    
+    document.getElementById('boysPlus1Btn').addEventListener('click', () => addPoints('boys', 1));
+    document.getElementById('boysPlus5Btn').addEventListener('click', () => addPoints('boys', 5));
+    document.getElementById('boysPlus10Btn').addEventListener('click', () => addPoints('boys', 10));
+    
+    document.getElementById('girlsWinBtn').addEventListener('click', () => awardWin('girls'));
+    document.getElementById('boysWinBtn').addEventListener('click', () => awardWin('boys'));
     document.getElementById('resetRoundBtn').addEventListener('click', resetRound);
+    document.getElementById('resetGameBtn').addEventListener('click', resetGame);
 
     // Initialize
     resetRound();
