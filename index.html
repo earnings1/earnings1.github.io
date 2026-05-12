@@ -1,115 +1,397 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Chat Controls Survival</title>
-
-  <style>
-    body {
-      margin: 0;
-      background: #0a0a0f;
-      color: white;
-      font-family: Arial;
-    }
-
-    #topBar {
-      text-align: center;
-      padding: 10px;
-      background: #111;
-      font-size: 20px;
-    }
-
-    #container {
-      display: flex;
-      height: 90vh;
-    }
-
-    #leftPanel, #rightPanel {
-      width: 250px;
-      background: #111;
-      padding: 10px;
-      overflow-y: auto;
-    }
-
-    #leftPanel { border-right: 2px solid purple; }
-    #rightPanel { border-left: 2px solid purple; }
-
-    #arena {
-      flex: 1;
-      position: relative;
-      background: radial-gradient(circle, #111 40%, #000 100%);
-    }
-
-    .enemy {
-      width: 20px;
-      height: 20px;
-      background: red;
-      border-radius: 50%;
-      position: absolute;
-    }
-
-    #player {
-      width: 25px;
-      height: 25px;
-      background: cyan;
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .event {
-      font-size: 14px;
-      margin: 5px 0;
-      color: #0f0;
-    }
-
-    #bottomBar {
-      height: 20px;
-      background: linear-gradient(to right, green 50%, red 50%);
-    }
-
-    #popup {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 30px;
-      color: yellow;
-      display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 BLADE ARENA - TikTok Live</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;900&display=swap');
+        body { font-family: 'Poppins', sans-serif; }
+        canvas { background: #050505; display: block; }
+    </style>
 </head>
+<body class="bg-black text-white overflow-hidden">
+    <div class="flex h-screen">
+        <!-- Game Area -->
+        <div class="flex-1 flex flex-col">
+            <div class="bg-zinc-900 px-6 py-4 flex justify-between items-center border-b border-zinc-700">
+                <div class="flex items-center gap-4">
+                    <div class="text-4xl">🌀⚔️</div>
+                    <div>
+                        <h1 class="text-4xl font-black tracking-tighter">BLADE ARENA</h1>
+                        <p class="text-emerald-400">Send a ROSE → Get Permanent Blades • 4 Minute Rounds</p>
+                    </div>
+                </div>
+                <div class="text-4xl font-mono font-bold text-yellow-400" id="timer">4:00</div>
+            </div>
 
-<body>
+            <div class="flex-1 flex items-center justify-center p-4 bg-zinc-950 relative">
+                <canvas id="gameCanvas" width="920" height="620" class="rounded-3xl shadow-2xl border border-zinc-800"></canvas>
+                
+                <!-- Round End Overlay -->
+                <div id="round-end" class="hidden absolute inset-0 bg-black/90 flex items-center justify-center rounded-3xl">
+                    <div class="text-center">
+                        <div class="text-6xl font-black mb-4 text-yellow-400" id="winner-text">ROUND OVER</div>
+                        <button onclick="startNewRound()" 
+                                class="mt-6 px-10 py-4 bg-white text-black text-xl font-bold rounded-3xl hover:scale-105 transition">
+                            Start New Round →
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-<div id="topBar">
-  Wave: <span id="wave">1</span> | Score: <span id="score">0</span>
-</div>
+            <div class="h-20 bg-zinc-900 flex items-center px-6 gap-4">
+                <button onclick="activateRoseGift()" 
+                        class="bg-gradient-to-r from-pink-500 to-rose-500 px-8 py-3 rounded-3xl font-bold hover:scale-105 transition flex items-center gap-2">
+                    <i class="fas fa-gift"></i>
+                    <span>ACTIVATE ROSE GIFT (Permanent Blades)</span>
+                </button>
+                
+                <button onclick="addRandomPlayer()" 
+                        class="bg-white text-black px-6 py-3 rounded-3xl font-bold hover:scale-105 transition">
+                    + New Player
+                </button>
+            </div>
+        </div>
 
-<div id="container">
+        <!-- Sidebar -->
+        <div class="w-80 bg-zinc-950 border-l border-zinc-700 flex flex-col">
+            <div class="p-5 border-b border-zinc-700">
+                <h3 class="font-bold text-lg mb-4">🏆 KILL LEADERBOARD</h3>
+                <div id="leaderboard" class="space-y-3"></div>
+            </div>
 
-  <div id="leftPanel">
-    <h3>Live Events</h3>
-    <div id="events"></div>
-  </div>
+            <div class="flex-1 p-5 overflow-y-auto text-sm" id="event-log"></div>
 
-  <div id="arena">
-    <div id="player"></div>
-    <div id="popup"></div>
-  </div>
+            <div class="p-5 border-t border-zinc-700 bg-zinc-900 text-xs">
+                <strong>Rules:</strong><br>
+                • Send ROSE gift → Host gives you permanent spinning blades<br>
+                • Only bladed players damage others (-10 points per hit)<br>
+                • 4 minute rounds • Most kills wins
+            </div>
+        </div>
+    </div>
 
-  <div id="rightPanel">
-    <h3>Gift Actions</h3>
-    <p>🌹 Rose → Enemy</p>
-    <p>🚀 Galaxy → Power Mode</p>
-    <p>🦁 Lion → Boss</p>
-  </div>
-
-</div>
-
-<div id="bottomBar"></div>
-
-<script src="game.js"></script>
+    <script>
+        const canvas = document.getElementById('gameCanvas')
+        const ctx = canvas.getContext('2d')
+        
+        let players = []
+        let particles = []
+        let time = 0
+        let roundTimeLeft = 240 // 4 minutes
+        let gameActive = true
+        
+        const avatars = [
+            "https://i.pravatar.cc/150?img=1","https://i.pravatar.cc/150?img=3",
+            "https://i.pravatar.cc/150?img=5","https://i.pravatar.cc/150?img=12",
+            "https://i.pravatar.cc/150?img=33","https://i.pravatar.cc/150?img=45"
+        ]
+        
+        class Player {
+            constructor(name, avatar) {
+                this.name = name
+                this.avatar = avatar
+                this.x = 100 + Math.random() * (canvas.width - 200)
+                this.y = 100 + Math.random() * (canvas.height - 200)
+                this.radius = 32
+                this.points = 300
+                this.kills = 0
+                this.vx = (Math.random() - 0.5) * 5.5
+                this.vy = (Math.random() - 0.5) * 5.5
+                this.hasBlades = false
+            }
+        }
+        
+        function addRandomPlayer() {
+            if (!gameActive) return
+            const names = ["@vibeking", "@fypqueen", "@dancegod", "@trendlord", "@liveblade"]
+            const name = names[Math.floor(Math.random() * names.length)] + Math.floor(Math.random() * 99)
+            const avatar = avatars[Math.floor(Math.random() * avatars.length)]
+            
+            const player = new Player(name, avatar)
+            players.push(player)
+            updateLeaderboard()
+            addEvent(`${name} joined the arena!`, "emerald")
+        }
+        
+        function activateRoseGift() {
+            if (players.length === 0 || !gameActive) return
+            const index = Math.floor(Math.random() * players.length)
+            const p = players[index]
+            if (!p.hasBlades) {
+                p.hasBlades = true
+                p.radius = 37
+                addEvent(`🌹 ${p.name} activated permanent blades with a ROSE!`, "rose")
+            }
+        }
+        
+        function checkCollisions() {
+            for (let i = 0; i < players.length; i++) {
+                for (let j = i + 1; j < players.length; j++) {
+                    const a = players[i]
+                    const b = players[j]
+                    
+                    const dx = b.x - a.x
+                    const dy = b.y - a.y
+                    const dist = Math.hypot(dx, dy)
+                    
+                    if (dist < a.radius + b.radius && dist > 0) {
+                        const nx = dx / dist
+                        const ny = dy / dist
+                        const overlap = (a.radius + b.radius) - dist
+                        
+                        a.x -= nx * overlap * 0.5
+                        a.y -= ny * overlap * 0.5
+                        b.x += nx * overlap * 0.5
+                        b.y += ny * overlap * 0.5
+                        
+                        if (a.hasBlades && !b.hasBlades) {
+                            damagePlayer(j, i)
+                        } else if (b.hasBlades && !a.hasBlades) {
+                            damagePlayer(i, j)
+                        }
+                    }
+                }
+            }
+        }
+        
+        function damagePlayer(victimIndex, attackerIndex) {
+            const victim = players[victimIndex]
+            const attacker = players[attackerIndex]
+            if (!victim || !attacker) return
+            
+            victim.points = Math.max(50, victim.points - 10)
+            
+            for (let i = 0; i < 12; i++) {
+                particles.push({
+                    x: victim.x,
+                    y: victim.y,
+                    vx: (Math.random() - 0.5) * 9,
+                    vy: (Math.random() - 0.5) * 9,
+                    life: 22,
+                    color: "#f43f5e"
+                })
+            }
+            
+            if (victim.points <= 60) {
+                attacker.kills++
+                addEvent(`💀 ${attacker.name} eliminated ${victim.name}`, "red")
+                
+                for (let i = 0; i < 50; i++) {
+                    particles.push({
+                        x: victim.x,
+                        y: victim.y,
+                        vx: (Math.random() - 0.5) * 16,
+                        vy: (Math.random() - 0.5) * 16,
+                        life: 45,
+                        color: "#ef4444"
+                    })
+                }
+                players.splice(victimIndex, 1)
+            }
+            updateLeaderboard()
+        }
+        
+        function addEvent(text, color = "pink") {
+            const log = document.getElementById('event-log')
+            const div = document.createElement('div')
+            div.className = `py-3 border-b border-zinc-800 text-${color}-400`
+            div.innerHTML = text
+            log.appendChild(div)
+            log.scrollTop = log.scrollHeight
+        }
+        
+        function updateLeaderboard() {
+            const container = document.getElementById('leaderboard')
+            container.innerHTML = ''
+            
+            const sorted = [...players].sort((a, b) => b.kills - a.kills)
+            
+            sorted.forEach(p => {
+                const div = document.createElement('div')
+                div.className = "flex items-center gap-3 bg-zinc-900 rounded-3xl p-4"
+                div.innerHTML = `
+                    <img src="${p.avatar}" class="w-12 h-12 rounded-2xl ring-2 ${p.hasBlades ? 'ring-red-500' : 'ring-zinc-700'}">
+                    <div class="flex-1">
+                        <div class="font-semibold">${p.name}</div>
+                        <div class="text-yellow-400">${p.points} pts • ${p.kills} kills</div>
+                    </div>
+                    ${p.hasBlades ? `<span class="text-3xl">🌀</span>` : ''}
+                `
+                container.appendChild(div)
+            })
+        }
+        
+        function drawSpinningBlades(player) {
+            if (!player.hasBlades) return
+            const bladeCount = 7
+            const bladeLength = player.radius + 24
+            const angleOffset = time * 0.32
+            
+            for (let i = 0; i < bladeCount; i++) {
+                const angle = (i * (Math.PI * 2) / bladeCount) + angleOffset
+                const x1 = player.x + Math.cos(angle) * (player.radius + 6)
+                const y1 = player.y + Math.sin(angle) * (player.radius + 6)
+                const x2 = player.x + Math.cos(angle) * bladeLength
+                const y2 = player.y + Math.sin(angle) * bladeLength
+                
+                ctx.strokeStyle = "#f43f5e"
+                ctx.lineWidth = 6.5
+                ctx.shadowBlur = 22
+                ctx.shadowColor = "#fb7185"
+                ctx.beginPath()
+                ctx.moveTo(x1, y1)
+                ctx.lineTo(x2, y2)
+                ctx.stroke()
+                
+                ctx.fillStyle = "#fda4af"
+                ctx.beginPath()
+                ctx.arc(x2, y2, 7, 0, Math.PI * 2)
+                ctx.fill()
+            }
+            ctx.shadowBlur = 0
+        }
+        
+        function gameLoop() {
+            time += 1
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            
+            players.forEach(p => {
+                // Movement
+                p.x += p.vx
+                p.y += p.vy
+                
+                // Gentle direction change
+                if (Math.random() < 0.03) {
+                    p.vx += (Math.random() - 0.5) * 2.2
+                    p.vy += (Math.random() - 0.5) * 2.2
+                }
+                
+                // IMPROVED WALL COLLISION - No more sticking
+                const margin = p.radius + 5
+                if (p.x - p.radius < margin) {
+                    p.x = margin
+                    p.vx = Math.abs(p.vx) * 1.1
+                }
+                if (p.x + p.radius > canvas.width - margin) {
+                    p.x = canvas.width - margin
+                    p.vx = -Math.abs(p.vx) * 1.1
+                }
+                if (p.y - p.radius < margin) {
+                    p.y = margin
+                    p.vy = Math.abs(p.vy) * 1.1
+                }
+                if (p.y + p.radius > canvas.height - margin) {
+                    p.y = canvas.height - margin
+                    p.vy = -Math.abs(p.vy) * 1.1
+                }
+                
+                // Draw ball
+                ctx.save()
+                ctx.shadowBlur = p.hasBlades ? 35 : 18
+                ctx.shadowColor = p.hasBlades ? "#f43f5e" : "#64748b"
+                
+                ctx.beginPath()
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
+                ctx.fillStyle = p.hasBlades ? "#4c1d1d" : "#27272a"
+                ctx.fill()
+                ctx.strokeStyle = p.hasBlades ? "#f43f5e" : "#71717a"
+                ctx.lineWidth = 9
+                ctx.stroke()
+                
+                // Avatar
+                const img = new Image()
+                img.src = p.avatar
+                ctx.save()
+                ctx.beginPath()
+                ctx.arc(p.x, p.y, p.radius - 10, 0, Math.PI * 2)
+                ctx.clip()
+                ctx.drawImage(img, p.x - (p.radius - 10), p.y - (p.radius - 10), (p.radius - 10)*2, (p.radius - 10)*2)
+                ctx.restore()
+                
+                // HP / Points in center
+                ctx.fillStyle = "white"
+                ctx.font = "bold 22px Poppins"
+                ctx.textAlign = "center"
+                ctx.textBaseline = "middle"
+                ctx.fillText(Math.floor(p.points), p.x, p.y)
+                
+                ctx.restore()
+                
+                drawSpinningBlades(p)
+            })
+            
+            // Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i]
+                p.x += p.vx
+                p.y += p.vy
+                p.life--
+                p.vx *= 0.96
+                p.vy *= 0.96
+                ctx.globalAlpha = p.life / 30
+                ctx.fillStyle = p.color
+                ctx.fillRect(p.x, p.y, 8, 8)
+            }
+            ctx.globalAlpha = 1
+            
+            checkCollisions()
+            updateLeaderboard()
+            
+            requestAnimationFrame(gameLoop)
+        }
+        
+        function updateTimer() {
+            if (!gameActive) return
+            roundTimeLeft--
+            const minutes = Math.floor(roundTimeLeft / 60)
+            const seconds = roundTimeLeft % 60
+            document.getElementById('timer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+            
+            if (roundTimeLeft <= 0) {
+                endRound()
+            }
+        }
+        
+        function endRound() {
+            gameActive = false
+            const sorted = [...players].sort((a, b) => b.kills - a.kills)
+            const winner = sorted[0]
+            
+            document.getElementById('winner-text').innerHTML = `
+                ${winner ? winner.name : 'No one'} WINS!<br>
+                <span class="text-2xl">with ${winner ? winner.kills : 0} kills</span>
+            `
+            document.getElementById('round-end').classList.remove('hidden')
+        }
+        
+        function startNewRound() {
+            roundTimeLeft = 240
+            gameActive = true
+            players = []
+            document.getElementById('round-end').classList.add('hidden')
+            for (let i = 0; i < 6; i++) addRandomPlayer()
+            addEvent("New round started!", "emerald")
+        }
+        
+        function massiveChaos() {
+            players.forEach(p => p.hasBlades = true)
+            addEvent("🌋 CHAOS MODE ENABLED", "red")
+        }
+        
+        window.onload = () => {
+            for (let i = 0; i < 7; i++) addRandomPlayer()
+            gameLoop()
+            setInterval(updateTimer, 1000)
+            
+            // Auto join
+            setInterval(() => {
+                if (gameActive && players.length < 14 && Math.random() > 0.5) addRandomPlayer()
+            }, 8000)
+        }
+    </script>
 </body>
 </html>
