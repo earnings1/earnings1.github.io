@@ -8,34 +8,40 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         body { font-family: 'Press Start 2P', sans-serif; }
-        canvas { background: #f0f0f0; image-rendering: pixelated; }
+        canvas { background: #f0f0f0; image-rendering: pixelated; border: 6px solid #000; }
     </style>
 </head>
 <body class="bg-black text-white overflow-hidden">
     <div class="flex h-screen">
-        <div class="flex-1 flex flex-col items-center justify-center bg-[#535353]">
-            <div class="mb-4 text-center">
-                <h1 class="text-5xl font-bold text-yellow-400 tracking-wider">DINO ARENA</h1>
-                <p class="text-emerald-400">Send ROSE → Fireball Attack!</p>
-            </div>
+        <!-- Game Area -->
+        <div class="flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-gray-800 to-black">
+            <h1 class="text-5xl font-bold text-yellow-400 mb-2 tracking-widest">DINO ARENA</h1>
+            <p class="text-emerald-400 mb-6">SPACE = JUMP • Send ROSE = Fireball Attack!</p>
             
-            <canvas id="gameCanvas" width="800" height="300" class="border-4 border-white shadow-2xl"></canvas>
+            <canvas id="gameCanvas" width="900" height="320" class="shadow-2xl"></canvas>
             
-            <div class="mt-6 text-center">
-                <p class="text-sm text-gray-400 mb-2">PRESS SPACE TO JUMP</p>
+            <div class="mt-6 flex gap-6">
                 <button onclick="simulateRose()" 
-                        class="bg-pink-600 hover:bg-pink-700 px-8 py-4 rounded-xl font-bold text-lg flex items-center gap-3 mx-auto">
+                        class="bg-gradient-to-r from-pink-500 to-rose-600 px-10 py-4 rounded-2xl font-bold text-lg flex items-center gap-3 hover:scale-105 transition">
                     🌹 SEND ROSE (Fireball)
                 </button>
+                <div class="text-sm text-gray-400 pt-4">
+                    Press <span class="text-white font-bold">SPACE</span> to Jump
+                </div>
             </div>
         </div>
 
-        <div class="w-80 bg-zinc-900 border-l border-zinc-700 p-6 overflow-auto">
-            <h3 class="text-xl font-bold mb-4">📊 SCORE</h3>
-            <div id="score" class="text-6xl font-bold text-yellow-400 mb-8">00000</div>
+        <!-- Live Panel -->
+        <div class="w-96 bg-zinc-900 border-l border-zinc-700 p-6 flex flex-col">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold mb-2">SCORE</h3>
+                <div id="score" class="text-7xl font-bold text-yellow-400">00000</div>
+            </div>
             
-            <h3 class="text-lg font-bold mb-3">Gift Log</h3>
-            <div id="gift-log" class="space-y-3 text-sm"></div>
+            <div>
+                <h3 class="text-lg font-bold mb-4">🌹 GIFT LOG</h3>
+                <div id="gift-log" class="space-y-3 text-sm overflow-y-auto flex-1"></div>
+            </div>
         </div>
     </div>
 
@@ -43,60 +49,73 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        let dino = { x: 80, y: 200, vy: 0, width: 44, height: 50, jumping: false };
-        let gravity = 0.85;
-        let jumpPower = -19;
+        let dino = { x: 80, y: 220, vy: 0, width: 48, height: 55, jumping: false };
+        let gravity = 0.92;
+        let jumpPower = -21;
         let score = 0;
-        let gameSpeed = 6;
+        let gameSpeed = 7;
         let gameOver = false;
         let obstacles = [];
         let fireballs = [];
-        let groundY = 220;
+        let groundY = 245;
         let frame = 0;
+
+        function resetGame() {
+            gameOver = false;
+            score = 0;
+            frame = 0;
+            obstacles = [];
+            fireballs = [];
+            dino.y = 220;
+            dino.vy = 0;
+            dino.jumping = false;
+            document.getElementById('score').textContent = "00000";
+            addGiftLog("🔄 GAME RESET! Press SPACE to jump");
+        }
 
         function drawDino() {
             ctx.fillStyle = '#111';
-            // Body
-            ctx.fillRect(dino.x + 8, dino.y + 8, 32, 28);
-            // Head
-            ctx.fillRect(dino.x + 35, dino.y - 2, 22, 22);
-            // Legs
-            ctx.fillRect(dino.x + 12, dino.y + 32, 9, 18);
-            ctx.fillRect(dino.x + 26, dino.y + 32, 9, 18);
-            // Eye
+            ctx.fillRect(dino.x + 10, dino.y + 10, 38, 32);           // body
+            ctx.fillRect(dino.x + 40, dino.y + 5, 25, 22);            // head
+            ctx.fillRect(dino.x + 15, dino.y + 38, 10, 20);           // leg1
+            ctx.fillRect(dino.x + 30, dino.y + 38, 10, 20);           // leg2
+            
             ctx.fillStyle = '#fff';
-            ctx.fillRect(dino.x + 48, dino.y + 6, 8, 8);
+            ctx.fillRect(dino.x + 55, dino.y + 12, 9, 9);             // eye
         }
 
         function drawGround() {
-            ctx.fillStyle = '#444';
-            ctx.fillRect(0, groundY + 35, canvas.width, 80);
-            ctx.strokeStyle = '#666';
-            ctx.lineWidth = 3;
-            for (let i = (frame * -gameSpeed) % 50; i < canvas.width + 50; i += 50) {
+            ctx.fillStyle = '#333';
+            ctx.fillRect(0, groundY + 35, canvas.width, 100);
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 4;
+            for (let i = (frame * -gameSpeed) % 60; i < canvas.width; i += 60) {
                 ctx.beginPath();
                 ctx.moveTo(i, groundY + 30);
-                ctx.lineTo(i + 30, groundY + 30);
+                ctx.lineTo(i + 35, groundY + 30);
                 ctx.stroke();
             }
         }
 
         function createObstacle() {
-            obstacles.push({ x: canvas.width, width: 28, height: 50 });
+            obstacles.push({ x: canvas.width, width: 32, height: 55 });
         }
 
         function createFireball() {
-            fireballs.push({ x: canvas.width + 30, y: dino.y + 15, speed: 11 });
-            addGiftLog("🌹 ROSE → Fireball launched!");
+            fireballs.push({ 
+                x: canvas.width + 40, 
+                y: dino.y + 15 + Math.random() * 30, 
+                speed: 12 
+            });
+            addGiftLog("🌹 ROSE → FIREBALL INCOMING!");
         }
 
         function update() {
             if (gameOver) return;
             frame++;
-            score += 2;
+            score += 3;
             document.getElementById('score').textContent = String(Math.floor(score)).padStart(5, '0');
 
-            // Dino jump physics
             dino.vy += gravity;
             dino.y += dino.vy;
 
@@ -106,27 +125,21 @@
                 dino.jumping = false;
             }
 
-            // Move obstacles & fireballs
             obstacles.forEach(o => o.x -= gameSpeed);
             fireballs.forEach(f => f.x -= f.speed);
 
-            // Remove offscreen
             obstacles = obstacles.filter(o => o.x > -50);
             fireballs = fireballs.filter(f => f.x > -50);
 
-            // Spawn obstacles
-            if (frame % 55 === 0) createObstacle();
+            if (frame % 48 === 0) createObstacle();
 
-            // Collision
+            // Collisions
             for (let o of obstacles) {
-                if (dino.x + dino.width > o.x && dino.x < o.x + o.width &&
-                    dino.y + dino.height > groundY - o.height) {
-                    gameOver = true;
-                }
+                if (dino.x + 45 > o.x && dino.x < o.x + o.width && 
+                    dino.y + dino.height - 10 > groundY - o.height) gameOver = true;
             }
             for (let f of fireballs) {
-                if (dino.x + dino.width > f.x - 15 && dino.x < f.x + 25 &&
-                    Math.abs(dino.y - f.y) < 35) {
+                if (Math.abs(dino.x + 40 - f.x) < 35 && Math.abs(dino.y + 20 - f.y) < 40) {
                     gameOver = true;
                 }
             }
@@ -136,29 +149,27 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawGround();
 
-            // Cacti
             ctx.fillStyle = '#166534';
             obstacles.forEach(o => ctx.fillRect(o.x, groundY - o.height, o.width, o.height));
 
-            // Fireballs
             ctx.fillStyle = '#f97316';
             fireballs.forEach(f => {
                 ctx.beginPath();
-                ctx.arc(f.x, f.y, 14, 0, Math.PI*2);
+                ctx.arc(f.x, f.y, 16, 0, Math.PI*2);
                 ctx.fill();
             });
 
             drawDino();
 
             if (gameOver) {
-                ctx.fillStyle = 'rgba(0,0,0,0.75)';
-                ctx.fillRect(0, 80, canvas.width, 140);
+                ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#fff';
-                ctx.font = '28px Press Start 2P';
+                ctx.font = '32px Press Start 2P';
                 ctx.textAlign = 'center';
-                ctx.fillText('GAME OVER', canvas.width/2, 150);
-                ctx.font = '16px Press Start 2P';
-                ctx.fillText('Send Rose to Attack', canvas.width/2, 190);
+                ctx.fillText('GAME OVER', canvas.width/2, 140);
+                ctx.font = '18px Press Start 2P';
+                ctx.fillText('Press SPACE to reset', canvas.width/2, 190);
             }
         }
 
@@ -169,7 +180,9 @@
         }
 
         function jump() {
-            if (!dino.jumping && !gameOver) {
+            if (gameOver) {
+                resetGame();
+            } else if (!dino.jumping) {
                 dino.vy = jumpPower;
                 dino.jumping = true;
             }
@@ -182,25 +195,25 @@
         function addGiftLog(text) {
             const log = document.getElementById('gift-log');
             const div = document.createElement('div');
-            div.className = "bg-zinc-800 p-3 rounded-xl";
+            div.className = "bg-zinc-800 p-4 rounded-2xl border-l-4 border-pink-500";
             div.textContent = text;
             log.appendChild(div);
-            if (log.children.length > 7) log.removeChild(log.firstChild);
+            if (log.children.length > 8) log.removeChild(log.firstChild);
         }
 
-        // ================== SPACE BAR JUMP ==================
-        document.addEventListener('keydown', (e) => {
+        // ================== SPACE BAR (Fixed & Reliable) ==================
+        document.addEventListener('keydown', e => {
             if (e.key === " " || e.key === "Spacebar") {
-                e.preventDefault();   // Prevent scrolling
+                e.preventDefault();
                 jump();
             }
         });
 
         canvas.addEventListener('click', jump);
-        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); });
+        canvas.addEventListener('touchstart', e => { e.preventDefault(); jump(); });
 
         window.onload = () => {
-            obstacles.push({ x: 500, width: 28, height: 50 });
+            obstacles.push({ x: 550, width: 32, height: 55 });
             gameLoop();
         };
     </script>
